@@ -1,4 +1,3 @@
-
 # pip
 pip is a package manager for Python packages
 
@@ -14,9 +13,11 @@ pip uninstall package_name		# uninstall installed package
 ```
 pip list
 ```
-**Install packages from requirements.txt**
+**Install/Update/Uninstall packages from requirements.txt**
 ```
-pip install -r requirements.txt
+pip install -r requirements.txt			# install libraries in the file along with their dependencies
+pip install -U -r requirements.txt		# update libraries in the file along with their dependencies
+pip uninstall -r requirements.txt 		# uninstall libraries from requirements.txt
 ```   
 **Generate requirements.txt**
 ```
@@ -52,10 +53,10 @@ pip uninstall -r requirements.txt 	# Generage requirements.txt
 
 ## pip list
 ```
-pip list    	# show installed packages in the tabular format
-pip list -l 	# show packages installed in the local virtual environment
-pip list -o 	# show outdated packages
-pip list -u 	# show up-to-date packages
+pip list    # show installed packages in the tabular format
+pip list -l # show packages installed in the local virtual environment
+pip list -o	# show outdated packages
+pip list -u	# show up-to-date packages
 ```
 ## pip freeze
 ```
