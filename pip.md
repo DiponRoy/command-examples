@@ -91,6 +91,7 @@ https://stackoverflow.com/a/56798606/2948523
 ```
 
 ## References
-https://dev.to/dev0928/commonly-used-python-pip-commands-255d
-https://dzone.com/articles/most-important-quotpipquot-commands-for-a-python-d
-**master**: https://pip.pypa.io/en/stable/cli/
+
+ - https://dev.to/dev0928/commonly-used-python-pip-commands-255d
+ - https://dzone.com/articles/most-important-quotpipquot-commands-for-a-python-d
+ -  **master**: https://pip.pypa.io/en/stable/cli/
