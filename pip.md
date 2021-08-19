@@ -1,7 +1,16 @@
 # pip
+<p align="left">
+    <a href="https://www.python.org" target="_blank">
+        <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/python/python-original.svg" alt="python" width="40" height="40" />
+    </a>
+</p>
+
 pip is a package manager for Python packages
+ -  **official**: https://pip.pypa.io/en/stable/cli/
+ - https://dev.to/dev0928/commonly-used-python-pip-commands-255d
+ - https://dzone.com/articles/most-important-quotpipquot-commands-for-a-python-d
 
-
+ 
 ## Most Used Commands
 **Install/Update/Uninstall package**
 ```
@@ -28,10 +37,10 @@ pip freeze > requirements.txt
 pip install package_name				# install latest available version
 pip install package_name==2.3			# install specific version
 pip install 'package_name>=2.3'			# any version above specified minimum version
-pip install 'package_name>=3.0,<4.0'	# any version above and below between specified minimum and maximun version
+pip install 'package_name>=3.0,<4.0' 	# any version above and below between specified minimum and maximun version
 ```
 ```
-pip install -r requirements.txt			# installs libraries in the file along with their dependencies
+pip install -r requirements.txt		# installs libraries in the file along with their dependencies
 ```
 
 ## pip update
@@ -68,11 +77,11 @@ pip freeze > requirements.txt	# generaget requirements.txt from installed packag
 ```
 ## pip show
 ```
-pip show package_name			# show information about a specified package
+pip show package_name	# show information about a specified package
 ```
 ## pip check
 ```
-pip check						#verify whether installed packages have compatible dependencies
+pip check	#verify whether installed packages have compatible dependencies
 ```
 ## pip search
 ```
@@ -90,9 +99,3 @@ pip install pip-review
 pip-review --interactive
 https://stackoverflow.com/a/56798606/2948523
 ```
-
-## References
-
- - https://dev.to/dev0928/commonly-used-python-pip-commands-255d
- - https://dzone.com/articles/most-important-quotpipquot-commands-for-a-python-d
- -  **master**: https://pip.pypa.io/en/stable/cli/
