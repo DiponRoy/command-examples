@@ -1,8 +1,12 @@
+
 # pip
 <p align="left">
-    <a href="https://www.python.org" target="_blank">
+       <a href="https://www.python.org" target="_blank">
         <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/python/python-original.svg" alt="python" width="40" height="40" />
     </a>
+    <a href="https://pypi.org/project/pip/" target="_blank">
+        <img src="https://pypi.org/static/images/logo-small.95de8436.svg" alt="python" width="40" height="40" />
+    </a>    
 </p>
 
 pip is a package manager for Python packages
