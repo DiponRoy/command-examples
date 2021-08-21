@@ -1,4 +1,5 @@
 
+
 # pip
 <p align="left">
        <a href="https://www.python.org" target="_blank">
@@ -14,8 +15,17 @@ pip is a package manager for Python packages
  - https://dev.to/dev0928/commonly-used-python-pip-commands-255d
  - https://dzone.com/articles/most-important-quotpipquot-commands-for-a-python-d
 
- 
+**Version**
+```
+python -V		#python version
+python --version
+
+pip -V			#pip version
+pip --version
+```
+
 ## Most Used Commands
+
 **Install/Update/Uninstall package**
 ```
 pip install package_name		# install latest available package version
