@@ -43,6 +43,13 @@ npm update		# update libraries in the file along with their dependencies
 npm start
 npm run script_name
 ```
+## version
+```
+node --version		#node version
+node -v
+npm --version		#npm version
+npm -v
+```
 ## npm init
 ```
 npm init	#Initiate a project
