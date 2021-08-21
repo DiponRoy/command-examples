@@ -8,30 +8,53 @@
 
 npm is a package manager for the JavaScript programming
  -  **official**: https://docs.npmjs.com/cli/v7/commands
+ - https://devhints.io/npm
  - https://www.freecodecamp.org/news/npm-cheat-sheet-most-common-commands-and-nvm/
  - https://www.sitepoint.com/npm-guide/
 
  
 ## Most Used Commands
+**Version**
+```
+node -v		#node version
+npm -v		#npm version
+```
+**Initiate**
+```
+npm init
+```
 **Install/Update/Uninstall package**
 ```
-pip install package_name		# install latest available package version
-pip install -U package_name		# update installed package to latest available version
-pip uninstall package_name		# uninstall installed package		
+npm install package_name	# install latest available package version
+npm update package_name		# update package to latest available version
+npm uninstall package_name	# remove installed package
 ```
 **Show installed packages**
 ```
-pip list
+npm list
 ```
-**Install/Update/Uninstall packages from requirements.txt**
+**Install/Update/Uninstall packages**
 ```
-pip install -r requirements.txt			# install libraries in the file along with their dependencies
-pip install -U -r requirements.txt		# update libraries in the file along with their dependencies
-pip uninstall -r requirements.txt 		# uninstall libraries from requirements.txt
+npm install		# install libraries in the file along with their dependencies
+npm update		# update libraries in the file along with their dependencies
 ```   
-**Generate requirements.txt**
+**Run project**
 ```
-pip freeze > requirements.txt
+npm start
+npm run script_name
+```
+## npm init
+```
+npm init	#Initiate a project
+npm init -y	#Initiate a project without answering questions
+```
+## npm install
+```
+npm install package_name				# install latest available package version
+npm install package_name1 package_name2	# install multiple packages to latest available versions		
+```
+```
+npm -i package_name		# install latest available package version
 ```
 ## pip install
 ```
@@ -43,7 +66,6 @@ pip install 'package_name>=3.0,<4.0' 	# any version above and below between spec
 ```
 pip install -r requirements.txt		# installs libraries in the file along with their dependencies
 ```
-
 ## pip update
 ```
 pip install -U package_name				# upgrade a single installed package to latest available version
@@ -61,12 +83,12 @@ pip uninstall -y package_name		# uninstall without confirmation
 pip uninstall -r requirements.txt 	# Generage requirements.txt
 ```
 
-## pip list
+## npm list
 ```
-pip list    # show installed packages in the tabular format
-pip list -l # show packages installed in the local virtual environment
-pip list -o	# show outdated packages
-pip list -u	# show up-to-date packages
+npm list    			# show installed packages in the tabular format
+npm list -g --depth 0	# show packages installed in the local virtual environment
+npm outdated			# show outdated packages
+npm view				# show up-to-date packages
 ```
 ## pip freeze
 ```
