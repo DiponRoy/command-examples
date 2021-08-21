@@ -1,4 +1,5 @@
 
+
 # npm
 <p align="left">
     <a href="https://www.python.org" target="_blank"><img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/npm/npm-original-wordmark.svg" alt="python" width="40" height="40" /></a>
@@ -12,13 +13,17 @@ npm is a package manager for the JavaScript programming
  - https://www.freecodecamp.org/news/npm-cheat-sheet-most-common-commands-and-nvm/
  - https://www.sitepoint.com/npm-guide/
 
- 
-## Most Used Commands
 **Version**
 ```
-node -v		#node version
-npm -v		#npm version
+node -v			#node version
+node --version
+
+npm -v			#npm version
+npm --version
 ```
+ 
+## Most Used Commands
+
 **Initiate**
 ```
 npm init
@@ -42,13 +47,6 @@ npm update		# update libraries in the file along with their dependencies
 ```
 npm start
 npm run script_name
-```
-## version
-```
-node --version		#node version
-node -v
-npm --version		#npm version
-npm -v
 ```
 ## npm init
 ```
