@@ -40,7 +40,8 @@ docker rm <container_id>			# remove a container
 docker kill <container_id>			# force stop a container
 docker rm -f <container_id>			# force remove a container
 
-docker system prune -a --volumes	#delete everything from docker https://stackoverflow.com/questions/44785585/how-to-delete-all-local-docker-images
+docker system prune -a --volumes	# delete everything from docker https://stackoverflow.com/questions/44785585/how-to-delete-all-local-docker-images
+docker system df                    # show storage and memory usages 
 
 docker-compose build --no-cache					# build containers listed at docker-compose.yml without using cache
 docker-compose build --no-cache service_name	# build a server listed at docker-compose.yml without using cache
