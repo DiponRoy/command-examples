@@ -64,6 +64,12 @@ docker-compose docker-compose.prod.yml up -d	# use docker-compose.prod.yml
 
 ```
 
+## Others
+**Space issue**
+C:\Users\user\AppData\Local\Docker\wsl\data .vhdx size is too big
+- this will remove active containners also if check container https://marcroussy.com/2020/12/01/cleaning-up-docker-disk-space-in-wsl2/
+- official https://github.com/microsoft/WSL/issues/4699
+- cmd https://dev.to/marzelin/how-to-reduce-size-of-docker-data-volume-in-docker-desktop-for-windows-v2-5d38
 
 ## tmpl
 **item**
