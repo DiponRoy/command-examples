@@ -21,6 +21,7 @@ exit
 diskpart
 ```
 [https://www.youtube.com/watch?v=DC89AryJEE8](https://www.youtube.com/watch?v=DC89AryJEE8)
+
 [https://rufus.ie/en/](https://rufus.ie/en/)
 
 ## tmpl
