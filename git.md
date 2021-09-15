@@ -6,6 +6,8 @@
     <a href="https://tortoisegit.org/" target="_blank"> <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/tortoisegit/tortoisegit-original.svg" alt="tortoisegit" width="40" height="40" /> </a>
 </p>
 
+https://www.youtube.com/watch?v=ecK3EnyGD8o
+
 npm is a package manager for the JavaScript programming
  -  **official**: https://docs.npmjs.com/cli/v7/commands
  - https://www.freecodecamp.org/news/npm-cheat-sheet-most-common-commands-and-nvm/
