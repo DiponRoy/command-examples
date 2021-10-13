@@ -24,6 +24,14 @@ diskpart
 
 [https://rufus.ie/en/](https://rufus.ie/en/)
 
+## Dual Bootable USB
+
+[https://www.ventoy.net/en/index.html](https://www.ventoy.net/en/index.html)
+
+[https://www.youtube.com/watch?v=ng8emZvia_c](https://www.youtube.com/watch?v=ng8emZvia_c)
+
+
+
 ## tmpl
 **item**
 ```
