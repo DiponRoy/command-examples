@@ -15,6 +15,11 @@ git rm -r --cached .
 git add .
 git commit -m "Update .gitignore"
 
+
+git ignore samples
+https://github.com/github/gitignore
+
+
 https://www.youtube.com/watch?v=ecK3EnyGD8o
 
 npm is a package manager for the JavaScript programming
