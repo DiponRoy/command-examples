@@ -6,6 +6,15 @@
     <a href="https://tortoisegit.org/" target="_blank"> <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/tortoisegit/tortoisegit-original.svg" alt="tortoisegit" width="40" height="40" /> </a>
 </p>
 
+
+re use git ignroe file
+git rm -r --cached .
+
+
+
+git add .
+git commit -m "Update .gitignore"
+
 https://www.youtube.com/watch?v=ecK3EnyGD8o
 
 npm is a package manager for the JavaScript programming
