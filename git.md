@@ -27,8 +27,19 @@ npm is a package manager for the JavaScript programming
 
 ## Git Cmds
 ```
+git status
+git pull
+git fetch
+git branch
+
 git add .
 git commit -m "Update .gitignore"
+
+git checkout bug_fix_v_0.1
+git checkout -f another-branch
+
+git tag Before_15Jan2021
+git push --tags
 ```
 
 ## Git Ignore
