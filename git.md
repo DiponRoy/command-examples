@@ -7,17 +7,14 @@
 </p>
 
 
-re use git ignroe file
-git rm -r --cached .
 
 
 
-git add .
-git commit -m "Update .gitignore"
 
 
-git ignore samples
-https://github.com/github/gitignore
+
+
+
 
 
 https://www.youtube.com/watch?v=ecK3EnyGD8o
@@ -28,15 +25,28 @@ npm is a package manager for the JavaScript programming
  - https://www.sitepoint.com/npm-guide/
 
 
+## Git Cmds
+```
+git add .
+git commit -m "Update .gitignore"
+```
+
 ## Git Ignore
-**Install/Update/Uninstall package**
+**.gitignore samples**
+https://github.com/github/gitignore
+
+
+**.gitignore**
 ```
 /tools                      # ignore everyting inside tools folder
 
 /tools/*                    # ignore everyting inside tools folder except packages.config
 !/tools/packages.config
 ```
- 
+ re use .gitignore file
+```
+git rm -r --cached .
+```
 
 ## need to add
 ```
