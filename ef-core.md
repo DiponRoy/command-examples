@@ -1,1 +1,24 @@
 
+# Entity Framework
+ 
+## Most Used Commands
+```
+Drop-Database
+
+Add-Migration MigrationName
+Remove-Migration MigrationName
+
+update-database
+
+Script-Migration
+Script-Migration -From 'PreviousMigration' -To 'LastMigration'
+```
+
+## tmpl
+**item**
+```
+cmd     #
+cmd     #
+cmd     #
+```
+## need to add
