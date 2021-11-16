@@ -23,11 +23,12 @@ docker --version
 ## Most Used Commands
 **Install/Update/Uninstall package**
 ```
-docker ps					# list running containers
+docker ps					                    # list running containers
 
-docker-compose build		# build containers listed at docker-compose.yml
-docker-compose up -d		# run containers listed at docker-compose.yml without logs
-docker-compose down			# stop containers listed at docker-compose.yml
+docker-compose build		                    # build containers listed at docker-compose.yml
+docker-compose up -d		                    # run containers listed at docker-compose.yml without logs
+docker-compose -f docker-compose.test.yml up -d # run containers listed at docker-compose.test.yml without logs
+docker-compose down			                    # stop containers listed at docker-compose.yml
 
 docker logs <container_id>	# show log of a container
 
