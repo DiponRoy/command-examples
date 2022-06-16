@@ -44,6 +44,12 @@ git push --tags
 
 git rev-parse HEAD
 git rev-parse --short HEAD
+
+
+git reset --hard HEAD
+git reset --hard origin/branch_name
+git revert commit_small_hash
+
 ```
 
 ## Git Ignore
