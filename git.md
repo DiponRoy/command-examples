@@ -37,9 +37,13 @@ git commit -m "Update .gitignore"
 
 git checkout bug_fix_v_0.1
 git checkout -f another-branch
+git checkout -b new-branch commit-ssh-1d0fa4fa9ea961182114b63976482e634a8067b8
 
 git tag Before_15Jan2021
 git push --tags
+
+git rev-parse HEAD
+git rev-parse --short HEAD
 ```
 
 ## Git Ignore
