@@ -1,3 +1,28 @@
+
+# redis
+<p align="left">
+    <a href="https://redis.io/" target="_blank"> <img src="https://cdn.iconscout.com/icon/free/png-256/redis-83994.png" alt="r" width="40" height="40" /> </a>
+</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+redis-cli is a terminal program used to send commands to and read replies from the Redis server
+ -  **official**: https://redis.io/docs/manual/cli/
+
+
+## Radis Cmds
+```
 SET key1 "Hello"
 DEL key1 key2 key3
 
@@ -13,3 +38,4 @@ redis-cli -h {hostname_IP} -p {port} -s {socket} -a {password} FLUSHALL
 
 redis-cli FLUSHDB ASYNC
 redis-cli FLUSHALL ASYNC
+```
