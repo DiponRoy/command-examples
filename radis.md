@@ -23,8 +23,9 @@ redis-cli is a terminal program used to send commands to and read replies from t
 
 ## Radis Cmds
 ```
-SET key1 "Hello"
-DEL key1 key2 key3
+redis-cli SET key1 "Hello"
+redis-cli GET key1
+redis-cli DEL key1
 
 for key in `echo 'KEYS user*' | redis-cli | awk '{print $1}'`
  do echo DEL $key
