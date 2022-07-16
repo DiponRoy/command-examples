@@ -27,7 +27,11 @@ redis-cli SET key1 "Hello"
 redis-cli GET key1
 redis-cli DEL key1
 
-for key in `echo 'KEYS user*' | redis-cli | awk '{print $1}'`
+for key in `echo 'KEYS key*' | redis-cli | awk '{print $1}'`
+ do echo GET $key
+done | redis-cli
+
+for key in `echo 'KEYS key*' | redis-cli | awk '{print $1}'`
  do echo DEL $key
 done | redis-cli
 
