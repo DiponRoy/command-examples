@@ -12,6 +12,8 @@ update-database
 
 Script-Migration
 Script-Migration -From 'PreviousMigration' -To 'LastMigration'
+
+Clear
 ```
 
 ## tmpl
