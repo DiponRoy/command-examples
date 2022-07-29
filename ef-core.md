@@ -9,6 +9,7 @@ Add-Migration MigrationName
 Remove-Migration MigrationName
 
 update-database
+Get-Migration
 
 Script-Migration
 Script-Migration -From 'PreviousMigration' -To 'LastMigration'
