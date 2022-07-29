@@ -22,7 +22,9 @@ Scaffold-DbContext "Server=(localdb)\mssqllocaldb;Database=AppDb;Trusted_Connect
 ## Scaffold
 **item**
 ```
-Scaffold-DbContext "Server=(localdb)\mssqllocaldb;Database=Blogging;Trusted_Connection=True;" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Models -Tables "Blog","Post" -ContextDir Context -Context BlogContext -ContextNamespace New.Namespace
+Add-Migration Identity  -c IdenityDbContext -o Migrations\IdenityDb
+Update-Database -Context  IdenityDbContext
+Script-Migration -Context  IdenityDbContext -o Web.IdentityServer\Migrations\IdenityDb.sql
 ```
 ## need to add
 
