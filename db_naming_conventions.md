@@ -11,7 +11,8 @@
 
 
 **SQL Server**
- - u
+ - https://github.com/ktaranov/sqlserver-kit/blob/master/SQL%20Server%20Name%20Convention%20and%20T-SQL%20Programming%20Style.md
+ - https://www.isbe.net/documents/sql_server_standards.pdf
 
 **Oracle**
  - https://oracle-base.com/articles/misc/naming-conventions
@@ -27,20 +28,35 @@
 
 | Object | SQL Server | Oracle  | PostgreSQL | MySQL |
 |---|---|---|---|---|
-| Db  |   |   |   |   |
+| Db  | KCRM  |   |   |   |
+| Schema  | dbo  |   |   |   |
 | Table | Student|  STUDENT | student | student |
 | Table | StudentDetail |  STUDENT_DETAIL | student_detail | student_detail |
 | Column | Id | ID | id |id |
 | Column | StudentId | STUDENT_ID | sutent_id |student_id |
-| Relational Table | Student_Subject | STUDENT_SUBJECT | student_subject |student_subject |
+| Column | UserName | USER_NAME | user_name |user_name |
+| PK  |   |   |   |   |
+| FK  |   |   |   |   |
+| SP  |   |   |   |   |
+| Index  |   |   |   |   |
+| View  |   |   |   |   |
+| Function  |   |   |   |   |
+| Trigger  |   |   |   |   |
+| Variable  |   |   |   |   |
+| Teamp Table  |   |   |   |   |
 |   |   |   |   |   |
 |   |   |   |   |   |
 |   |   |   |   |   |
 |   |   |   |   |   |
-|   |   |   |   |   |
-|   |   |   |   |   |
-|   |   |   |   |   |
-|   |   |   |   |   |
-|   |   |   |   |   |
-|   |   |   |   |   |
-|   |   |   |   |   |
+
+**Common Columns**
+
+ - Id 
+ - DataSource 
+ - IsActive 
+ - CreatedAtUtc 
+ - CreatedBy 
+ - UpdatedAtUtc 
+ - UpdatedBy
+ - DeletedAtUtc 
+ - DeletedBy
