@@ -50,7 +50,6 @@
 |   |   |   |   |   |
 
 **Common Columns**
-
  - Id 
  - DataSource 
  - IsActive 
@@ -60,3 +59,31 @@
  - UpdatedBy
  - DeletedAtUtc 
  - DeletedBy
+
+**Style of Writing**
+ - camelCase
+ - PascalCase
+ - snake_case
+ - MACRO_CASE
+ 
+ https://stackoverflow.com/questions/17326185/what-are-the-different-kinds-of-cases
+```
++--------------------------+-------------------------------------------------------------+
+| Formatting               | Name(s)                                                     |
++--------------------------+-------------------------------------------------------------|
+| namingidentifier         | flat case/Lazy Case                                         |
+| NAMINGIDENTIFIER         | upper flat case                                             |
+| namingIdentifier         | (lower) camelCase, dromedaryCase                            |
+| NamingIdentifier         | (upper) CamelCase, PascalCase, StudlyCase, CapitalCamelCase |
+| naming_identifier        | snake_case, snake_case, pothole_case, C Case                |
+| Naming_Identifier        | Camel_Snake_Case                                            |
+| NAMING_IDENTIFIER        | SCREAMING_SNAKE_CASE, MACRO_CASE, UPPER_CASE, CONSTANT_CASE |
+| naming-identifier        | Kebab Case/caterpillar-case/dash-case, hyphen-case,         |
+|                          | lisp-case, spinal-case and css-case                         |
+| NAMING-IDENTIFIER        | TRAIN-CASE, COBOL-CASE, SCREAMING-KEBAB-CASE                |
+| Naming-Identifier        | Train-Case, HTTP-Header-Case                                |
+| _namingIdentifier        | Undercore Notation (prefixed by "_" followed by camelCase   |
+| datatypeNamingIdentifier | Hungarian Notation (variable names Prefixed by metadata     |
+|                          | data-types which is out-dated)                              |
+|--------------------------+-------------------------------------------------------------+
+```
