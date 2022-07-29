@@ -29,7 +29,9 @@
 |---|---|---|---|---|
 | Db  |   |   |   |   |
 | Table | Student|  STUDENT | student | student |
-| Table | StudentDetail|  STUDENT_DETAIL | student_detail | student_detail |
+| Table | StudentDetail |  STUDENT_DETAIL | student_detail | student_detail |
+| Column | Id | ID | id |id |
+| Column | StudentId | STUDENT_ID | sutent_id |student_id |
 | Relational Table | Student_Subject | STUDENT_SUBJECT | student_subject |student_subject |
 |   |   |   |   |   |
 |   |   |   |   |   |
