@@ -19,7 +19,7 @@
  - https://ss64.com/ora/syntax-naming.html
 
 **PostgreSQL**   
- - u
+ - why not use camelCase column? SELECT camelCase FROM table will not work, have to use "camelCase" https://www.youtube.com/watch?v=Q-hyZDW8S0E
  
 **MySQL**
  - u
@@ -28,6 +28,7 @@
 
 | Object | SQL Server | Oracle  | PostgreSQL | MySQL |
 |---|---|---|---|---|
+| Style of Writing | PascalCase | MACRO_CASE | snake_case | snake_case |
 | Db  | KCRM  |   |   |   |
 | Schema  | dbo  |   |   |   |
 | Table | Student|  STUDENT | student | student |
