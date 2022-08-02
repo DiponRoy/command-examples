@@ -24,6 +24,7 @@ Scaffold-DbContext "Server=(localdb)\mssqllocaldb;Database=AppDb;Trusted_Connect
 ```
 Add-Migration Identity  -c IdenityDbContext -o Migrations\IdenityDb
 Update-Database -Context  IdenityDbContext
+Remove-Migration Identity -Context  IdenityDbContext
 Script-Migration -Context  IdenityDbContext -o Web.IdentityServer\Migrations\IdenityDb.sql
 ```
 ## need to add
