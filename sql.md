@@ -100,7 +100,12 @@ ALTER TABLE Users DROP CONSTRAINT UC_Users_UserName;
 ## tmpl
 **item**
 ```
-cmd     #
-cmd     #
-cmd     #
+DROP TABLE IF EXISTS Users;
+CREATE TABLE Users
+(
+	Id INT,
+	UserName VARCHAR(300),
+	AccountStatusId INT,
+	CreatedON DATETIME NULL
+);
 ```
