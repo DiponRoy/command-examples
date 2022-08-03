@@ -1,3 +1,7 @@
+Basic https://www.w3schools.com/sql/sql_constraints.asp
+Unique Indexes vs Unique Constraints https://www.mssqltips.com/sqlservertip/4270/difference-between-sql-server-unique-indexes-and-unique-constraints/
+
+
 ## DROP
 ```
 DROP TABLE [dbo].[Users];
@@ -7,6 +11,7 @@ DROP TABLE IF EXISTS [dbo].[Users];
 ## COLUMN
 ```
 ALTER TABLE [dbo].[Users] ADD CreatedON DATETIME NULL;
+ALTER TABLE [dbo].[Users] ALTER COLUMN CreatedON DATETIME NOT NULL;
 
 ALTER TABLE [dbo].[Users] DROP COLUMN CreatedON;
 ```
@@ -42,7 +47,7 @@ ALTER TABLE Users ADD CONSTRAINT CHK_Users_AccountStatusId CHECK (AccountStatusI
 ALTER TABLE Users DROP CONSTRAINT CHK_Users_AccountStatusId;
 ```
 
-## UNIQUE CONSTRAINT
+## UNIQUE KEY CONSTRAINT
 ```
 ALTER TABLE Users ADD CONSTRAINT UC_Users_UserName UNIQUE (UserName);
 
@@ -61,6 +66,15 @@ CREATE INDEX IX_Users_UserName ON Users (UserName);
 
 DROP INDEX Users.IX_Users_UserName;
 ALTER TABLE Users DROP INDEX IX_Users_UserName;   --mysql
+```
+
+## UNIQUE INDEX
+```
+ALTER TABLE Users ADD CONSTRAINT UC_Users_UserName UNIQUE (UserName);
+CREATE UNIQUE INDEX UIX_Users_UserName ON Users (UserName);
+
+DROP INDEX Users.UIX_Users_UserName;
+ALTER TABLE Users DROP CONSTRAINT UC_Users_UserName;
 ```
 
 
