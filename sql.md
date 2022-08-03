@@ -77,8 +77,13 @@ ALTER TABLE Users DROP CONSTRAINT UC_Users_UserName_AccountStatusId;
 CREATE INDEX IX_Users_UserName ON Users (UserName);
 
 DROP INDEX Users.IX_Users_UserName;
-ALTER TABLE Users DROP INDEX IX_Users_UserName;   --mysql
 ```
+**Descending**
+```
+CREATE INDEX IX_Users_CreatedON ON Users (CreatedON DESC);
+```
+
+
 
 ## UNIQUE INDEX
 ```
