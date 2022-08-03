@@ -1,3 +1,9 @@
+## DROP
+```
+DROP TABLE [dbo].[Users];
+DROP TABLE IF EXISTS [dbo].[Users];
+```
+
 ## COLUMN
 ```
 ALTER TABLE [dbo].[Users] ADD CreatedON DATETIME NULL;
