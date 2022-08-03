@@ -27,11 +27,19 @@ ALTER TABLE [dbo].[Users] DROP CONSTRAINT FK_Users_UserTypes;
 
 ## DEFAULT CONSTRAINT
 ```
+UPDATE TABLE [dbo].[Users] SET CreatedON = GETUTCDATE();
 ALTER TABLE [dbo].[Users] ALTER COLUMN CreatedON DATETIME NOT NULL;
 ALTER TABLE [dbo].[Users] ADD CONSTRAINT DF_Users_CreatedON DEFAULT GETUTCDATE() FOR [CreatedON];
 
 ALTER TABLE [dbo].[Users] DROP CONSTRAINT DF_Users_CreatedON;
 ALTER TABLE [dbo].[Users] DROP COLUMN CreatedON;
+```
+
+## CHECK CONSTRAINT
+```
+ALTER TABLE Users ADD CONSTRAINT CHK_AccountStatusId CHECK (AccountStatusId IN (0, 1, 2));
+
+ALTER TABLE Users DROP CONSTRAINT CHK_AccountStatusId;
 ```
 
 
