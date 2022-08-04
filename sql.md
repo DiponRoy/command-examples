@@ -366,7 +366,7 @@ INSERT INTO AccountStatus VALUES (5, N'x', N'x');
 
 DECLARE @logs TABLE (
 	ID INT,
-	Actions NVARCHAR (200) NULL
+	ActionType NVARCHAR (200) NULL
 )
 
 MERGE [dbo].[AccountStatus] AS T
