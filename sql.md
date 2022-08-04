@@ -46,6 +46,7 @@ END
 ## PRIMARY KEY CONSTRAINT
 ```
 ALTER TABLE [dbo].[Users] ADD CONSTRAINT PK_Users PRIMARY KEY(Id);
+ALTER TABLE [dbo].[Users] ADD CONSTRAINT PK_Users PRIMARY KEY CLUSTERED (Id ASC);
 
 ALTER TABLE [dbo].[Users] DROP CONSTRAINT PK_Users;
 ```
@@ -231,6 +232,15 @@ DBCC CHECKIDENT('tblName', RESEED, 0);
 
 ## MERGE
 ```
+DROP TABLE IF EXISTS AccountStatus;
+CREATE TABLE [dbo].[AccountStatus] (
+    [ID]                   INT NOT NULL,
+    [AccountStatusName]    NVARCHAR (200) NOT NULL,
+    [AccountStatusName_FR] NVARCHAR (200) NULL
+);
+INSERT INTO AccountStatus VALUES (5, N'x', N'x');
+
+
 MERGE [dbo].[AccountStatus] AS T
 USING ( VALUES 
 	(1, N'Activated', N'Activé'),
