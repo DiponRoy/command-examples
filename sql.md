@@ -108,6 +108,24 @@ BEGIN
 END
 ```
 
+## CURSOR
+```
+DECLARE @id INT, @name VARCHAR(250);
+DECLARE tblCoursor CURSOR FOR
+	SELECT Id, UserName
+	FROM [Users]  o
+	WHERE o.AccountStatusId = 2;
+OPEN tblCoursor
+	FETCH NEXT FROM tblCoursor INTO @id, @name
+	WHILE(@@FETCH_STATUS = 0)
+	BEGIN
+		PRINT CONCAT(@id, ' ', @name);
+		FETCH NEXT FROM tblCoursor INTO @id, @name
+	END
+CLOSE tblCoursor
+DEALLOCATE tblCoursor
+```
+
 
 
 
