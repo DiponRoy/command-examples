@@ -126,7 +126,35 @@ CLOSE tblCoursor
 DEALLOCATE tblCoursor
 ```
 
+## TRY CATCH
+```
+BEGIN TRY
+	/*Do something*/
+	PRINT 'Hello';
+END TRY
+BEGIN CATCH
+	DECLARE @error VARCHAR = 'Error message.';
+	THROW 50000, @error, 1;  
+END CATCH
+```
 
+## TRANSACTION
+```
+DECLARE @mainTran VARCHAR(250) = 'TRANSACTION_NAME' ;
+BEGIN TRANSACTION @mainTran;
+BEGIN TRY
+	/*Do something*/
+	PRINT 'Hello';
+
+	COMMIT TRANSACTION @mainTran
+END TRY
+BEGIN CATCH
+	ROLLBACK TRANSACTION @mainTran;
+
+	DECLARE @error VARCHAR = 'Error message.';
+	THROW 50000, @error, 1;   
+END CATCH
+```
 
 
 ## tmpl
