@@ -10,6 +10,13 @@ DROP TABLE IF EXISTS [dbo].[Users];
 IF OBJECT_ID(N'[dbo].[Users]', N'U') IS NOT NULL
 	DROP TABLE [dbo].[Users]
 ```
+**Temp Table**
+```
+IF object_id('tempdb..#tblRelation') IS NOT NULL
+    DROP TABLE #tblRelation;
+IF object_id('tempdb..##tblDetails') IS NOT NULL
+    DROP TABLE ##tblDetails;
+```
 
 ## COLUMN
 ```
