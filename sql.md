@@ -353,6 +353,56 @@ DELETE Users
 OUTPUT deleted.Id
 WHERE Id = 1
 ```
+**With Merge**
+```
+DROP TABLE IF EXISTS AccountStatus;
+CREATE TABLE [dbo].[AccountStatus] (
+    [ID]                   INT NOT NULL,
+    [AccountStatusName]    NVARCHAR (200) NOT NULL,
+    [AccountStatusName_FR] NVARCHAR (200) NULL
+);
+INSERT INTO AccountStatus VALUES (1, N'x', N'x');
+INSERT INTO AccountStatus VALUES (5, N'x', N'x');
+
+DECLARE @logs TABLE (
+	ID INT,
+	Actions NVARCHAR (200) NULL
+)
+
+MERGE [dbo].[AccountStatus] AS T
+USING ( VALUES 
+	(1, N'Activated', N'Activé'),
+	(2, N'Inactive', N'Inactif'),
+	(3, N'Disabled', N'Désactivé'),
+	(4, N'None', N'Aucun') /*will delete after db migrations*/
+) AS S ([ID], [AccountStatusName], [AccountStatusName_FR])
+ON T.[ID] = S.[ID]
+WHEN MATCHED
+    THEN UPDATE 
+        SET 
+            T.[AccountStatusName] = S.[AccountStatusName],
+            T.[AccountStatusName_FR] =  S.[AccountStatusName_FR]
+		--OUTPUT inserted.ID, $action INTO @logs;
+WHEN NOT MATCHED BY TARGET
+    THEN INSERT ([ID], [AccountStatusName], [AccountStatusName_FR])
+        VALUES ([ID], [AccountStatusName], [AccountStatusName_FR])
+		--OUTPUT inserted.ID, $action INTO @logs;
+WHEN NOT MATCHED BY SOURCE
+    THEN DELETE
+	--OUTPUT deleted.ID, $action INTO @logs;
+	OUTPUT 
+	(
+		CASE $action
+			WHEN 'INSERT' THEN inserted.ID
+			WHEN 'UPDATE' THEN inserted.ID
+			WHEN 'DELETE' THEN deleted.ID
+			ELSE ''
+		END
+	)
+	, $action INTO @logs;
+
+SELECT * FROM @logs;
+```
 
 ## PIVOT
 ```
