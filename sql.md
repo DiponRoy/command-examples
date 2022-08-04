@@ -217,6 +217,35 @@ WHEN NOT MATCHED BY SOURCE
 ```
 
 
+## DATETIME
+```
+SELECT
+	[Now] = GETDATE(),
+	[UtcNow] = GETUTCDATE(),
+	[YesterdayNow] = DATEADD(DD, -1, GETDATE()),
+	[TomorrowNow] = DATEADD(DD, 1, GETDATE()),
+
+	[Date] = CONVERT(DATE, GETDATE()),
+
+	[DateTimeFromString] = CONVERT(DATETIME, '2021.08.16', 102),
+	[DateTimeToString] = CONVERT(VARCHAR(100), GETDATE(), 102),
+
+	[DayNo] = DATEPART(DAY, GETDATE()),
+	[WeekDayNo] = DATEPART(WEEKDAY, GETDATE()),
+	[MonthNo] = DATEPART(MONTH, GETDATE()),
+	[YearNo] = DATEPART(YEAR, GETDATE()),
+
+	[WeekDayName] = DATENAME(WEEKDAY, GETDATE()),
+	[MonthName] = DATENAME(MONTH, GETDATE())
+	;
+```
+**Day Range**
+```
+SELECT
+	DATEADD(DAY, DATEDIFF(DAY, 0, GETDATE()), 0) AS StartDateTime,
+	DATEADD(SECOND, -1, DATEADD(DAY, DATEDIFF(DAY, 0, GETDATE()) + 1, 0)) AS EndDateTime
+```
+
 ## tmpl
 **item**
 ```
