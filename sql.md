@@ -183,6 +183,31 @@ BEGIN
 END
 ```
 
+## CASE 
+**Simple CASE**
+```
+DECLARE @userTypeId INT = 2;
+DECLARE @userType VARCHAR(100);
+SET @userType = CASE @userTypeId
+                    WHEN 1 THEN 'Admin'
+                    WHEN 2 THEN 'User'
+                    ELSE 'Unknown'
+                END;
+SELECT @userType;
+```
+**Searched CASE**
+```
+DECLARE @userTypeId INT = 2;
+DECLARE @userType VARCHAR(100);
+SET @userType = CASE 
+                    WHEN @userTypeId = 1 THEN 'Admin'
+                    WHEN @userTypeId = 2 THEN 'User'
+                    ELSE 'Unknown'
+                END;
+SELECT @userType; 
+```
+
+
 ## IDENTITY ON OF
 ```
 SET IDENTITY_INSERT [dbo].[AccountStatus] ON 
