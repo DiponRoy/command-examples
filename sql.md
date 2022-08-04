@@ -168,6 +168,35 @@ BEGIN
 END
 ```
 
+## IDENTITY ON OF
+```
+SET IDENTITY_INSERT [dbo].[AccountStatus] ON 
+/*do something*/
+SET IDENTITY_INSERT [dbo].[AccountStatus] OFF
+```
+
+## MERGE
+```
+MERGE [dbo].[AccountStatus] AS T
+USING ( VALUES 
+	(1, N'Activated', N'Activé'),
+	(2, N'Inactive', N'Inactif'),
+	(3, N'Disabled', N'Désactivé'),
+	(4, N'None', N'Aucun') /*will delete after db migrations*/
+) AS S ([ID], [AccountStatusName], [AccountStatusName_FR])
+ON T.[ID] = S.[ID]
+WHEN MATCHED
+    THEN UPDATE 
+        SET 
+            T.[AccountStatusName] = S.[AccountStatusName],
+            T.[AccountStatusName_FR] =  S.[AccountStatusName_FR]
+WHEN NOT MATCHED BY TARGET
+    THEN INSERT ([ID], [AccountStatusName], [AccountStatusName_FR])
+        VALUES ([ID], [AccountStatusName], [AccountStatusName_FR])
+WHEN NOT MATCHED BY SOURCE
+    THEN DELETE;
+```
+
 
 ## tmpl
 **item**
