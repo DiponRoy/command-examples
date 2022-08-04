@@ -168,13 +168,18 @@ END CATCH
 
 ## IF ELSE
 ```
-IF 1=2
+DECLARE @value INT = 3;
+IF @value=1
 BEGIN
-	PRINT 'True';
+	PRINT '1';
+END
+ELSE IF @value=2
+BEGIN
+	PRINT '2';
 END
 ELSE
 BEGIN
-	PRINT 'False';
+	PRINT 'Unknown';
 END
 ```
 
