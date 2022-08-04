@@ -300,6 +300,17 @@ SELECT * FROM Users WHERE CreatedON BETWEEN '2021-12-20 00:00:00.000' AND '2022-
 SELECT * FROM Users WHERE '2021-12-20 10:34:00' < CreatedON AND CreatedON < '2021-12-21 00:00:00';    --date time greater less
 ```
 
+**DateTime to String**
+```
+DECLARE @dateTime DATETIME = GETDATE();
+SELECT 
+	CONVERT(VARCHAR, @dateTime, 23),  --yyyy-mm-dd
+	CONVERT(VARCHAR, @dateTime, 8),   --hh:mm:ss
+	RIGHT(STUFF(SUBSTRING(CONVERT(VARCHAR, @dateTime, 22), 11, LEN(CONVERT(VARCHAR, @dateTime, 22))-1), 1, 0, replicate('0',11)),11),	--hh:mm:ss AM/PM
+	CONVERT(VARCHAR, @dateTime, 120),  --yyyy-mm-dd hh:mm:ss
+	CONVERT(VARCHAR, @dateTime, 121)   --yyyy-mm-dd hh:mm:ss:nnn
+```
+
 ## Anonymous 
 **table**
 ```
@@ -432,6 +443,23 @@ SELECT *
             FOR Component
             IN([Basic],[Hra],[TA])
     )AS DtlPivot
+```
+
+## Leading Trailling 
+```
+DECLARE @defaultChar CHAR = '0', @defaultLen INT = 6, @inputValue VARCHAR(100) = 'xxx';
+SELECT 
+	--RIGHT(STUFF(@inputValue, 1, 0, REPLICATE(@defaultChar,@defaultLen)),@defaultLen) AddLeading,
+	--LEFT(STUFF(@inputValue+' ', LEN(@inputValue)+1, 0, REPLICATE(@defaultChar,@defaultLen)),@defaultLen) AddTrailing;
+	REPLICATE(@defaultChar, @defaultLen-LEN(@inputValue)) + @inputValue AddLeading,
+	@inputValue + REPLICATE(@defaultChar, @defaultLen-LEN(@inputValue)) AddTrailing;
+```
+
+```
+DECLARE @pattern NVARCHAR(1000) = '100000000001', @value VARCHAR(100) = 'xxx';
+SELECT 
+	SUBSTRING(@pattern, 0, LEN(@pattern) + 1 - LEN(@value)) + CAST(@value AS NVARCHAR),
+	CAST(@value AS NVARCHAR) + SUBSTRING(@pattern, LEN(@value) + 1, LEN(@pattern))
 ```
 
 ## tmpl
