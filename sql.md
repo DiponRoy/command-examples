@@ -94,6 +94,20 @@ DROP INDEX Users.UIX_Users_UserName;
 ALTER TABLE Users DROP CONSTRAINT UC_Users_UserName;
 ```
 
+## LOOP
+```
+DECLARE @orderId INT = 0;
+WHILE @orderId < 5
+BEGIN
+	--IF @orderId > 5
+	--	BREAK;
+	--IF @orderId <= 0
+	--	CONTINUE;
+	PRINT @orderId;
+	SET @orderId = @orderId +1;
+END
+```
+
 
 
 
