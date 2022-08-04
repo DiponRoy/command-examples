@@ -292,6 +292,14 @@ SELECT
 FROM TempUsers;
 ```
 
+## OUTPUT 
+```
+INSERT INTO 
+	Users (Id, UserName, AccountStatusId, CreatedON)
+OUTPUT inserted.Id
+VALUES (1, 'A', 2, GETUTCDATE());
+```
+
 ## tmpl
 **item**
 ```
