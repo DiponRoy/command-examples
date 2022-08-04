@@ -300,6 +300,36 @@ OUTPUT inserted.Id
 VALUES (1, 'A', 2, GETUTCDATE());
 ```
 
+## PIVOT
+```
+DROP TABLE IF EXISTS Employeesalarydetails;
+CREATE TABLE Employeesalarydetails(
+    Empid BIGINT,
+    Component VARCHAR(100),
+    Amount FLOAT,
+);
+INSERT 
+    INTO Employeesalarydetails
+    VALUES(2, 'Basic', 10000),
+    (2, 'Hra', 1000),
+    (2, 'TA', 750),
+    (1, 'Basic', 20000),
+    (1, 'Hra', 1000),
+    (3, 'Basic', 6700),
+    (3, 'Hra', 100),
+    (4, 'Basic', 5000),
+    (4, 'Hra', 1000);
+
+
+SELECT *
+    FROM Employeesalarydetails
+    PIVOT(
+        SUM(Amount)
+            FOR Component
+            IN([Basic],[Hra],[TA])
+    )AS DtlPivot
+```
+
 ## tmpl
 **item**
 ```
