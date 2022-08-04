@@ -186,4 +186,5 @@ VALUES
 (1, 'A', 2),
 (2, 'B', 2),
 (3, 'B', 2);
+SELECT COUNT(1) FROM Users;
 ```
