@@ -246,6 +246,15 @@ SELECT
 	DATEADD(SECOND, -1, DATEADD(DAY, DATEDIFF(DAY, 0, GETDATE()) + 1, 0)) AS EndDateTime	--MILLISECOND
 ```
 
+**Compare**
+```
+SELECT * FROM Users WHERE CreatedON BETWEEN DATEADD(MINUTE, -6, GETUTCDATE()) AND GETUTCDATE();			--data added in last 5 mint
+SELECT * FROM Users WHERE CAST(CreatedON AS DATE) = '2021-12-20' ;										--date equal
+SELECT * FROM Users WHERE CreatedON = '2021-12-20 10:34:03' ;											--date time equal
+SELECT * FROM Users WHERE CreatedON BETWEEN '2021-12-20 00:00:00.000' AND '2022-06-02 23:59:59.000';	--date time range
+SELECT * FROM Users WHERE '2021-12-20 10:34:00' < CreatedON AND CreatedON < '2021-12-21 00:00:00';		--date time greater less
+```
+
 ## tmpl
 **item**
 ```
@@ -258,10 +267,13 @@ CREATE TABLE Users
 	CreatedON DATETIME NULL
 );
 INSERT INTO 
-	Users (Id, UserName, AccountStatusId)
+	Users (Id, UserName, AccountStatusId, CreatedON)
 VALUES 
-(1, 'A', 2),
-(2, 'B', 2),
-(3, 'B', 2);
+(1, 'A', 2, GETUTCDATE()),
+(2, 'B', 2, DATEADD(MINUTE, -2, GETUTCDATE())),
+(3, 'B', 2, '2021-12-20 14:34:03'),
+(3, 'B', 2, '2021-12-20 10:34:03'),
+(3, 'B', 2, '2021-12-21 00:00:00'),
+(4, 'B', 2, NULL);
 SELECT COUNT(1) FROM Users;
 ```
