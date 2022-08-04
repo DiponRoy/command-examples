@@ -180,4 +180,10 @@ CREATE TABLE Users
 	AccountStatusId INT,
 	CreatedON DATETIME NULL
 );
+INSERT INTO 
+	Users (Id, UserName, AccountStatusId)
+VALUES 
+(1, 'A', 2),
+(2, 'B', 2),
+(3, 'B', 2);
 ```
