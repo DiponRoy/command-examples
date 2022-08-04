@@ -333,6 +333,15 @@ INSERT INTO
 	Users (Id, UserName, AccountStatusId, CreatedON)
 OUTPUT inserted.Id
 VALUES (1, 'A', 2, GETUTCDATE());
+
+UPDATE Users
+SET UserName = 'B'
+OUTPUT inserted.Id, deleted.UserName, inserted.UserName
+WHERE Id = 1
+
+DELETE Users
+OUTPUT deleted.Id
+WHERE Id = 1
 ```
 
 ## PIVOT
