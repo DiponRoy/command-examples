@@ -255,6 +255,43 @@ SELECT * FROM Users WHERE CreatedON BETWEEN '2021-12-20 00:00:00.000' AND '2022-
 SELECT * FROM Users WHERE '2021-12-20 10:34:00' < CreatedON AND CreatedON < '2021-12-21 00:00:00';    --date time greater less
 ```
 
+## Anonymous 
+**table**
+```
+SELECT *
+FROM
+(
+	VALUES
+	(1, 'A', 2, GETUTCDATE()),
+	(2, 'B', 2, DATEADD(MINUTE, -2, GETUTCDATE())),
+	(3, 'B', 2, '2021-12-20 14:34:03'),
+	(3, 'B', 2, '2021-12-20 10:34:03'),
+	(3, 'B', 2, '2021-12-21 00:00:00'),
+	(4, 'B', 2, NULL)
+) AS Users (Id, UserName, AccountStatusId, CreatedON)
+```
+
+## INSERT 
+**Multi Row**
+```
+INSERT INTO 
+	Users (Id, UserName, AccountStatusId, CreatedON)
+VALUES 
+(1, 'A', 2, GETUTCDATE()),
+(2, 'B', 2, DATEADD(MINUTE, -2, GETUTCDATE())),
+(3, 'B', 2, '2021-12-20 14:34:03'),
+(3, 'B', 2, '2021-12-20 10:34:03'),
+(3, 'B', 2, '2021-12-21 00:00:00'),
+(4, 'B', 2, NULL);
+```
+```
+INSERT INTO 
+	Users (Id, UserName, AccountStatusId, CreatedON)
+SELECT 
+	Id, UserName, AccountStatusId, CreatedON
+FROM TempUsers;
+```
+
 ## tmpl
 **item**
 ```
