@@ -175,6 +175,15 @@ SET IDENTITY_INSERT [dbo].[AccountStatus] ON
 SET IDENTITY_INSERT [dbo].[AccountStatus] OFF
 ```
 
+## RESET IDENTITY
+```
+TRUNCATE TABLE tblName;
+--or
+DELETE FROM tblName;
+
+DBCC CHECKIDENT('tblName', RESEED, 0);
+```
+
 ## MERGE
 ```
 MERGE [dbo].[AccountStatus] AS T
