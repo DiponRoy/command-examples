@@ -3,9 +3,12 @@
 
 
 ## DROP
+**Table**
 ```
 DROP TABLE [dbo].[Users];
 DROP TABLE IF EXISTS [dbo].[Users];
+IF OBJECT_ID(N'[dbo].[Users]', N'U') IS NOT NULL
+	DROP TABLE [dbo].[Users]
 ```
 
 ## COLUMN
