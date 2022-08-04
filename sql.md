@@ -156,6 +156,18 @@ BEGIN CATCH
 END CATCH
 ```
 
+## IF ELSE
+```
+IF 1=2
+BEGIN
+	PRINT 'True';
+END
+ELSE
+BEGIN
+	PRINT 'False';
+END
+```
+
 
 ## tmpl
 **item**
