@@ -1,6 +1,8 @@
 - Basic https://www.w3schools.com/sql/sql_constraints.asp
 - Unique Indexes vs Unique Constraints https://www.mssqltips.com/sqlservertip/4270/difference-between-sql-server-unique-indexes-and-unique-constraints/
 - DateTime conversion number https://www.mssqltips.com/sqlservertip/1145/date-and-time-conversions-using-sql-server/
+- Functions
+    - [w3schools](https://www.w3schools.com/sql/sql_ref_sqlserver.asp)
 
 ```
 SELECT @@VERSION
