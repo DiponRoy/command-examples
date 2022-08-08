@@ -508,6 +508,28 @@ FROM Users
 ORDER BY ID OFFSET @pageSize*(@pageNumber-1) ROWS FETCH NEXT @pageSize ROWS ONLY;
 ```
 
+## ROW_NUMBER, RANK, DENSE_RANK
+```
+DROP TABLE IF EXISTS Employee;
+GO
+CREATE TABLE Employee  
+(  
+Names VARCHAR(10),  
+Salary INT  
+)  
+GO
+INSERT INTO dbo.Employee  
+VALUES ('Rony',10000),('Joy',9000),('Devid',8000),('Warner',7000),('Elly',7000),('Frenil',6000), ('Tod',7000) 
+GO  
+
+SELECT   
+	*,  
+	ROW_NUMBER() OVER (ORDER BY salary DESC) RowNumber,  
+	RANK() OVER (ORDER BY salary DESC) [Rank],  
+	DENSE_RANK() OVER (ORDER BY salary DESC) DenseRank 
+FROM Employee
+```
+
 ## tmpl
 **item**
 ```
