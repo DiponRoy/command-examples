@@ -509,6 +509,7 @@ ORDER BY ID OFFSET @pageSize*(@pageNumber-1) ROWS FETCH NEXT @pageSize ROWS ONLY
 ```
 
 ## ROW_NUMBER, RANK, DENSE_RANK
+https://www.c-sharpcorner.com/blogs/difference-between-rownumber-rank-denserank-in-sql-server#:~:text=RANK()%20will%20assign%20the,without%20skipping%20the%20next%20number.
 ```
 DROP TABLE IF EXISTS Employee;
 GO
