@@ -463,6 +463,50 @@ SELECT
 	SUBSTRING(@pattern, 0, LEN(@pattern) + 1 - LEN(@value)) + CAST(@value AS NVARCHAR),
 	CAST(@value AS NVARCHAR) + SUBSTRING(@pattern, LEN(@value) + 1, LEN(@pattern))
 ```
+## Pagination
+```
+DROP TABLE IF EXISTS [dbo].[Users]
+GO
+CREATE TABLE [dbo].[Users](
+	[Id] [bigint] IDENTITY(1,1) NOT NULL PRIMARY KEY,
+	[Name] [nvarchar](max) NULL,
+	[Email] [nvarchar](max) NULL,
+	[IsDeleted] BIT NOT NULL
+)
+GO
+TRUNCATE TABLE Users
+GO
+DECLARE @count INT = 0;
+WHILE @count < 100
+BEGIN
+	INSERT INTO Users([Name], [IsDeleted], [Email]) VALUES ('d', 0, 'd@gmail.com');
+	SET @count = @count + 1;
+END
+GO
+SELECT COUNT(*) FROM Users WITH(NOLOCK);
+```
+
+```
+DECLARE @pageSize INT = 10, @pageNumber INT = 10;
+WITH PagedData 
+as
+(
+	SELECT 
+		*,
+		ROW_NUMBER() OVER (ORDER BY Id) AS RowNumber
+	FROM Users
+)
+SELECT 
+	*
+FROM PagedData
+WHERE RowNumber BETWEEN ((@pageNumber-1)*@pageSize)+1 AND @pageSize*@pageNumber;
+```
+```
+DECLARE @pageSize INT = 10, @pageNumber INT = 10;
+SELECT * 
+FROM Users 
+ORDER BY ID OFFSET @pageSize*(@pageNumber-1) ROWS FETCH NEXT @pageSize ROWS ONLY;
+```
 
 ## tmpl
 **item**
