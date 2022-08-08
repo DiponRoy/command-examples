@@ -532,7 +532,15 @@ SELECT
 	DENSE_RANK() OVER (ORDER BY salary DESC) DenseRank 
 FROM Employee
 ```
-
+| Name | Salary | RowNumber | Rank | DenseRank |
+|--|--|--|--|--|
+|Rony	|10000	|1	|1	|1
+|Joy		|9000	|2	|2	|2
+|Devid	|8000	|3	|3	|3
+|Warner	|7000	|4	|4	|4
+|Elly	|7000	|5	|4	|4
+|Tod		|7000	|6	|4	|4
+|Frenil	|6000	|7	|7	|5
 
 ## tmpl
 **item**
