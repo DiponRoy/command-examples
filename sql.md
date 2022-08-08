@@ -552,6 +552,46 @@ FROM Employee
 |Tod		|7000	|6	|4	|4
 |Frenil	|6000	|7	|7	|5
 
+**Use with partition**
+```
+DROP TABLE IF EXISTS Users;
+CREATE TABLE Users
+(
+	Id INT,
+	UserName VARCHAR(300),
+	RoleCount INT,
+);
+INSERT INTO 
+	Users (Id, UserName, RoleCount)
+VALUES 
+(1, 'AA', 0),
+(2, 'Aa', 1),
+(3, 'aa', 4),
+
+(4, 'BB', 0),
+(5, 'Bb', 1),
+(6, 'bb', 4);
+GO
+
+SELECT 
+	*,
+	UPPER(LTRIM(RTRIM([UserName]))) as NormalizedUserName,
+	ROW_NUMBER() OVER (PARTITION BY UPPER(LTRIM(RTRIM([UserName]))) ORDER BY RoleCount DESC) AS Sequance,
+	DENSE_RANK() OVER (ORDER BY UPPER(LTRIM(RTRIM([UserName])))) AS GroupNo
+FROM Users
+```
+| Id | UserName | RoleCount | NormalizedUserName | Sequance | GroupNo |
+|--|--|--|--|--|--|
+|3	|aa	|4	|AA	|1	|1
+|2	|Aa	|1	|AA	|2	|1
+|1	|AA	|0	|AA	|3	|1
+|6	|bb	|4	|BB	|1	|2
+|5	|Bb	|1	|BB	|2	|2
+|4	|BB	|0	|BB	|3	|2
+
+## PARTITION BY
+https://www.sqlshack.com/sql-partition-by-clause-overview/
+
 ## tmpl
 **item**
 ```
