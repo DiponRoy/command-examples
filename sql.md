@@ -517,8 +517,8 @@ DROP TABLE IF EXISTS Employee;
 GO
 CREATE TABLE Employee  
 (  
-Names VARCHAR(10),  
-Salary INT  
+	Names VARCHAR(10),  
+	Salary DECIMAL  
 )  
 GO
 INSERT INTO dbo.Employee  
@@ -532,6 +532,7 @@ SELECT
 	DENSE_RANK() OVER (ORDER BY salary DESC) DenseRank 
 FROM Employee
 ```
+
 
 ## tmpl
 **item**
