@@ -102,7 +102,6 @@ CREATE INDEX IX_Users_CreatedON ON Users (CreatedON DESC);
 ```
 
 
-
 ## UNIQUE INDEX
 ```
 ALTER TABLE Users ADD CONSTRAINT UC_Users_UserName UNIQUE (UserName);
@@ -110,6 +109,17 @@ CREATE UNIQUE INDEX UIX_Users_UserName ON Users (UserName);
 
 DROP INDEX Users.UIX_Users_UserName;
 ALTER TABLE Users DROP CONSTRAINT UC_Users_UserName;
+```
+
+## All In One
+```
+SELECT 
+	UserName, COUNT(Id) AS Total
+FROM Users
+WHERE UserName IS NOT NULL
+GROUP BY UserName
+HAVING COUNT(Id) > 2
+ORDER BY UserName
 ```
 
 ## LOOP
