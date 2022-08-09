@@ -537,9 +537,9 @@ GO
 
 SELECT   
 	*,  
-	ROW_NUMBER() OVER (ORDER BY salary DESC) RowNumber,  
-	RANK() OVER (ORDER BY salary DESC) [Rank],  
-	DENSE_RANK() OVER (ORDER BY salary DESC) DenseRank 
+	ROW_NUMBER() OVER (ORDER BY Salary DESC) RowNumber,  
+	RANK() OVER (ORDER BY Salary DESC) [Rank],  
+	DENSE_RANK() OVER (ORDER BY Salary DESC) DenseRank 
 FROM Employee
 ```
 | Name | Salary | RowNumber | Rank | DenseRank |
@@ -551,6 +551,29 @@ FROM Employee
 |Elly	|7000	|5	|4	|4
 |Tod		|7000	|6	|4	|4
 |Frenil	|6000	|7	|7	|5
+
+**DENSE_RANK alternative**
+```
+WITH UniquSalary
+AS
+(
+	SELECT Salary FROM Employee GROUP BY Salary	
+),
+SalaryRank
+AS
+(
+	SELECT 
+		*,
+		ROW_NUMBER() OVER (ORDER BY Salary DESC) RankNumber
+	FROM UniquSalary
+)
+SELECT
+	e.*,
+	s.RankNumber
+FROM Employee AS e
+LEFT JOIN SalaryRank AS s ON e.Salary = s.Salary
+ORDER BY s.RankNumber
+```
 
 **Use with partition**
 ```
