@@ -232,6 +232,12 @@ SET IDENTITY_INSERT [dbo].[AccountStatus] ON
 /*do something*/
 SET IDENTITY_INSERT [dbo].[AccountStatus] OFF
 ```
+## CONSTRAINT CHECK NOCHECK
+```
+ALTER TABLE [dbo].[AccountStatus] NOCHECK CONSTRAINT ALL;
+/*do something*/
+ALTER TABLE [dbo].[AccountStatus] CHECK CONSTRAINT ALL;
+```
 
 ## RESET IDENTITY
 ```
