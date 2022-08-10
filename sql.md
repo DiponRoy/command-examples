@@ -381,6 +381,13 @@ WHERE Id = 1
 DELETE Users
 OUTPUT deleted.Id
 WHERE Id = 1
+
+DECLARE @Ids_tbl TABLE ([Id] INT); /*should be table variable*/
+INSERT INTO 
+	Users (Id, UserName, AccountStatusId, CreatedON)
+OUTPUT inserted.Id INTO @Ids_tbl(Id)
+VALUES (1, 'A', 2, GETUTCDATE());
+SELECT * FROM @Ids_tbl;
 ```
 **With Merge**
 ```
