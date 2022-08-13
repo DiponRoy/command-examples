@@ -9,15 +9,37 @@ Ts https://www.typescriptlang.org/play
 Js https://jsfiddle.net/
 
 ## run
+**C#**
 ```
-dotnet run                                        # run
-dotnet run /seed                                  # run with a argument value /seed
+using System;
 
-dotnet watch run                                  # run as watch mode, default port 5000
-dotnet watch run --urls=http://localhost:5001     # run as watch mode using port 5001, or can usehttp://0.0.0.0:5001
+public class Program
+{
+	public static void Main(string[] args)
+	{
+		Console.WriteLine("Hello World");
+	}
+}
+```
+*Ts**
+```
+function init() : void {
+	console.log("Hello World");
+};
+init();
+```
+*Js**
+```
+(function init() {
+	console.log("Hello World");
+}());
+```
+**Py**
+```
+import sys;
 
-dotnet run program.cs                             # run a file
-dotnet run program.cs /seed                       # run a file with a argument value /seed
+if __name__=="__main__":
+	print("Hello World");
 ```
 
 ## tmpl
