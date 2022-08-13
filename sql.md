@@ -165,6 +165,7 @@ BEGIN CATCH
 	THROW 50000, @error, 1;  
 END CATCH
 ```
+There is no FINALLY
 
 ## TRANSACTION
 ```
