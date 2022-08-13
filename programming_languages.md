@@ -21,14 +21,14 @@ public class Program
 	}
 }
 ```
-*Ts**
+**Ts**
 ```
 function init() : void {
 	console.log("Hello World");
 };
 init();
 ```
-*Js**
+**js**
 ```
 (function init() {
 	console.log("Hello World");
