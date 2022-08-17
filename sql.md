@@ -368,6 +368,7 @@ FROM TempUsers;
 ```
 
 ## OUTPUT 
+Doesn't work with funciton
 ```
 INSERT INTO 
 	Users (Id, UserName, AccountStatusId, CreatedON)
@@ -390,7 +391,7 @@ OUTPUT inserted.Id INTO @Ids_tbl(Id)
 VALUES (1, 'A', 2, GETUTCDATE());
 SELECT * FROM @Ids_tbl;
 ```
-**With Merge**
+**With MERGE**
 ```
 DROP TABLE IF EXISTS AccountStatus;
 CREATE TABLE [dbo].[AccountStatus] (
@@ -439,6 +440,26 @@ WHEN NOT MATCHED BY SOURCE
 	, $action INTO @logs;
 
 SELECT * FROM @logs;
+```
+**With PROCEDURE**
+```
+DROP PROCEDURE IF EXISTS SP_GenerateBill;
+GO
+CREATE PROCEDURE SP_GenerateBill (
+	@month INT,
+	@year INT,
+	@totalAmount DECIMAL OUTPUT
+)
+AS
+BEGIN
+	/*Do other things*/
+	SET @totalAmount = 100
+END;
+GO
+
+DECLARE @amount DECIMAL
+EXEC SP_GenerateBill @month=12, @year=12, @totalAmount=@amount OUTPUT;
+SELECT @amount AS BillAmount;
 ```
 
 ## PIVOT
