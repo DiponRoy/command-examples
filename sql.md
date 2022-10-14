@@ -52,6 +52,13 @@ ALTER TABLE [dbo].[Users] ADD CONSTRAINT PK_Users PRIMARY KEY CLUSTERED (Id ASC)
 
 ALTER TABLE [dbo].[Users] DROP CONSTRAINT PK_Users;
 ```
+**Composite key**
+```
+ALTER TABLE [dbo].[Group_User] ADD CONSTRAINT PK_Group_User PRIMARY KEY(GroupId, UserId);
+ALTER TABLE [dbo].[Group_User] ADD CONSTRAINT PK_Group_User PRIMARY KEY(GroupId ASC, UserId ASC);
+
+ALTER TABLE [dbo].[Group_User] DROP CONSTRAINT PK_Group_User;
+```
 
 ## FOREIGN KEY CONSTRAINT
 ```
@@ -654,6 +661,7 @@ https://www.sqlshack.com/sql-partition-by-clause-overview/
 **item**
 ```
 DROP TABLE IF EXISTS Users;
+GO
 CREATE TABLE Users
 (
 	Id INT,
@@ -661,6 +669,7 @@ CREATE TABLE Users
 	AccountStatusId INT,
 	CreatedON DATETIME NULL
 );
+GO
 INSERT INTO 
 	Users (Id, UserName, AccountStatusId, CreatedON)
 VALUES 
@@ -670,5 +679,18 @@ VALUES
 (3, 'B', 2, '2021-12-20 10:34:03'),
 (3, 'B', 2, '2021-12-21 00:00:00'),
 (4, 'B', 2, NULL);
+GO
 SELECT COUNT(1) FROM Users;
+
+
+GO
+DROP TABLE IF EXISTS Group_User
+GO
+CREATE TABLE Group_User
+(
+	GroupId INT NOT NULL,
+	UserId INT NOT NULL
+)
+GO
+SELECT COUNT(1) FROM Group_User;
 ```
