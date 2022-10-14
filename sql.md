@@ -66,6 +66,12 @@ ALTER TABLE [dbo].[Users] ADD CONSTRAINT FK_Users_UserTypes FOREIGN KEY (UserTyp
 
 ALTER TABLE [dbo].[Users] DROP CONSTRAINT FK_Users_UserTypes;
 ```
+**Composite key**
+```
+ALTER TABLE [dbo].[GroupUserImage] ADD CONSTRAINT FK_GroupUserImage_GroupUser FOREIGN KEY (GroupId, UserId) REFERENCES Group_User(GroupId, UserId);
+
+ALTER TABLE [dbo].[GroupUserImage] DROP CONSTRAINT FK_GroupUserImage_GroupUser;
+```
 
 ## DEFAULT CONSTRAINT
 ```
@@ -680,10 +686,6 @@ VALUES
 (3, 'B', 2, '2021-12-21 00:00:00'),
 (4, 'B', 2, NULL);
 GO
-SELECT COUNT(1) FROM Users;
-
-
-GO
 DROP TABLE IF EXISTS Group_User
 GO
 CREATE TABLE Group_User
@@ -692,5 +694,14 @@ CREATE TABLE Group_User
 	UserId INT NOT NULL
 )
 GO
-SELECT COUNT(1) FROM Group_User;
+DROP TABLE IF EXISTS GroupUserImage
+GO
+CREATE TABLE GroupUserImage
+(
+	Id INT NOT NULL,
+	GroupId INT NOT NULL,
+	UserId INT NOT NULL,
+	ImageLink VARCHAR(MAX)
+)
+GO
 ```
