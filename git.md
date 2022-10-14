@@ -1,4 +1,5 @@
 
+
 # git
 <p align="left">
     <a href="https://git-scm.com/" target="_blank"> <img src="https://www.vectorlogo.zone/logos/git-scm/git-scm-icon.svg" alt="git" width="40" height="40" /> </a>
@@ -45,13 +46,42 @@ git push --tags
 git rev-parse HEAD
 git rev-parse --short HEAD
 
+git merge branchName	#Git Rebase vs Git Merge https://www.youtube.com/watch?v=Lo3u3TV7t5I
+git rebase branchName
 
 git reset --hard HEAD
 git reset --hard origin/branch_name
 git revert commit_small_hash
 
-```
+git log									#https://stackoverflow.com/a/1340245/2948523
+git log --grep=13929					#where commit message like 13929
+git log --author=Dipon					#where autor like dipon
+git log --first-parent develop/13929	#where branch name develop/13929
+git log --grep=13929 --author=Dipon --first-parent develop/13929_Product_Hiererchy_Fix --reverse --pretty=format:"%h"
 
+git rev-list							#https://manpages.ubuntu.com/manpages/bionic/man1/git-rev-list.1.html
+
+git cherry-pick af02e0b					#https://stackoverflow.com/questions/1670970/how-to-cherry-pick-multiple-commits	
+git cherry-pick d573ed1bd 21ea438e2		#multiple-commits	
+git cherry-pick af02e0b --no-commit		#apply only changes without commit
+										#https://stackoverflow.com/questions/15687346/git-cherry-pick-range-of-commits-and-exclude-some-in-between
+										
+HEAD VS Origin
+git show head		#https://stackoverflow.com/questions/8196544/what-are-the-git-concepts-of-head-master-origin
+
+git log      --grep=13929 --author=Dipon --branches develop/13929_Product_Hiererchy_Fix --reverse --pretty=format:"%H"
+git rev-list --grep=13929 --author=Dipon --branches develop/13929_Product_Hiererchy_Fix --reverse origin..HEAD
+git rev-list --grep=13929 --author=Dipon --branches develop/13929_Product_Hiererchy_Fix --reverse origin..HEAD | git cherry-pick --stdin
+```
+## Sample
+**Commit Message**
+```
+13929: Code review fixes
+-Drop previous product_hierarchy table and use new one
+-Use temp tables in procedure
+-Change Hierarchies to Hierarchy in C# end
+-Validation fixes
+```
 ## Git Ignore
 **.gitignore samples**
 https://github.com/github/gitignore
@@ -69,15 +99,28 @@ https://github.com/github/gitignore
 git rm -r --cached .
 ```
 
-## need to add
+## Errors
+```
+git status
+```
+**error: index uses extension, which we do not understand fatal: index file corrupt**
+```
+https://stackoverflow.com/a/1115956/2948523
+del .git\index
+git reset
+```
+**fatal: not a git repository (or any of the parent directories): .git**
+```
+https://stackoverflow.com/questions/20413459/fatal-not-a-git-repository-or-any-of-the-parent-directories-git
+git init
+
+```
+
+## Title
+**Avout**
 ```
 --force-reinstall
 ```
 ```
 --no-cache-dir
-```
-```
-pip install pip-review
-pip-review --interactive
-https://stackoverflow.com/a/56798606/2948523
 ```
