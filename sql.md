@@ -61,6 +61,7 @@ ALTER TABLE [dbo].[Group_User] DROP CONSTRAINT PK_Group_User;
 ```
 
 ## FOREIGN KEY CONSTRAINT
+If you really want to create a foreign key to a non-primary key, it MUST be a column that has a unique constraint on it.
 ```
 ALTER TABLE [dbo].[Users] ADD CONSTRAINT FK_Users_UserTypes FOREIGN KEY (UserTypeId) REFERENCES UserTypes (Id);
 
@@ -330,6 +331,8 @@ SELECT * FROM Users WHERE CAST(CreatedON AS DATE) = '2021-12-20' ;              
 SELECT * FROM Users WHERE CreatedON = '2021-12-20 10:34:03' ;                                         --date time equal
 SELECT * FROM Users WHERE CreatedON BETWEEN '2021-12-20 00:00:00.000' AND '2022-06-02 23:59:59.000';  --date time range
 SELECT * FROM Users WHERE '2021-12-20 10:34:00' < CreatedON AND CreatedON < '2021-12-21 00:00:00';    --date time greater less
+SELECT * FROM Users WHERE CAST(CreatedON AS TIME) <> '00:00:00.0000000';							  --dates with time
+SELECT * FROM Users WHERE CAST(CreatedON AS TIME) = '00:00:00.0000000';							  	  --dates without time
 ```
 
 **DateTime to String**
