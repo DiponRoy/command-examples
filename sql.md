@@ -75,13 +75,19 @@ ALTER TABLE [dbo].[GroupUserImage] DROP CONSTRAINT FK_GroupUserImage_GroupUser;
 ```
 
 ## DEFAULT CONSTRAINT
+**Not Nullable**
 ```
+ALTER TABLE [dbo].[Users] ALL CreatedON DATETIME NULL;
 UPDATE TABLE [dbo].[Users] SET CreatedON = GETUTCDATE();
 ALTER TABLE [dbo].[Users] ALTER COLUMN CreatedON DATETIME NOT NULL;
 ALTER TABLE [dbo].[Users] ADD CONSTRAINT DF_Users_CreatedON DEFAULT GETUTCDATE() FOR [CreatedON];
 
 ALTER TABLE [dbo].[Users] DROP CONSTRAINT DF_Users_CreatedON;
 ALTER TABLE [dbo].[Users] DROP COLUMN CreatedON;
+```
+**Nullable**
+```
+ALTER TABLE [dbo].[Users] ADD VisibleOnId INT NULL CONSTRAINT DF_Users_VisibleOn DEFAULT 1 WITH VALUES;
 ```
 
 ## CHECK CONSTRAINT
