@@ -1,5 +1,6 @@
 
 
+
 # git
 <p align="left">
     <a href="https://git-scm.com/" target="_blank"> <img src="https://www.vectorlogo.zone/logos/git-scm/git-scm-icon.svg" alt="git" width="40" height="40" /> </a>
@@ -114,6 +115,18 @@ git reset
 https://stackoverflow.com/questions/20413459/fatal-not-a-git-repository-or-any-of-the-parent-directories-git
 git init
 
+```
+**error: cannot lock ref 'refs/remotes/origin/Develop/Bug_14222_Top3ClimbersInActivityFeed': Unable to create 'D:/workstation/channelassist/Git/ChannelManager/.git/refs/remotes/origin/Develop/Bug_14222_Top3ClimbersInActivityFeed.lock': File exists.**
+```
+https://stackoverflow.com/questions/72574209/git-pull-error-cannot-lock-ref-ref-remotes-origin-xxx-exists-cannot-crea
+git fetch --prune
+
+or(tested)
+Go to D:/workstation/channelassist/Git/ChannelManager/.git/refs/remotes/origin/Develop/
+delete Bug_14222_Top3ClimbersInActivityFeed and Bug_14222_Top3ClimbersInActivityFeed.lock
+
+or remove folder
+D:/workstation/channelassist/Git/ChannelManager/.git/refs/remotes/origin
 ```
 
 ## Title
