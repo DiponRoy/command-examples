@@ -106,6 +106,23 @@ git rm -r --cached .
 
 ## Story
 
+**Change message of previous commit**
+https://medium.com/@igor_marques/git-basics-adding-more-changes-to-your-last-commit-1629344cb9a8
+```
+git add -A
+git commit --amend --no-edit
+git push -f
+
+git commit --amend -m "Your new commit message"		#edit the last commit
+git push -f
+```
+
+**Check how file got deleted**
+https://stackoverflow.com/questions/6839398/find-when-a-file-was-deleted-in-git
+```
+git log --full-history -- Presentation/Nop.Web/package-lock.json
+git log --full-history -1 -- Presentation/Nop.Web/package-lock.json
+```
 
 **Undo a merge**
 https://www.freecodecamp.org/news/git-undo-merge-how-to-revert-the-last-merge-commit-in-git/
