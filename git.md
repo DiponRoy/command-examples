@@ -104,6 +104,17 @@ https://github.com/github/gitignore
 git rm -r --cached .
 ```
 
+## Story
+
+
+**Undo a merge**
+https://www.freecodecamp.org/news/git-undo-merge-how-to-revert-the-last-merge-commit-in-git/
+```
+git reset --soft HEAD~1					#undo last commit or merge, and changes as uncommit
+
+git reset --hard HEAD~1					#undo last commit or merge
+git reset --merge HEAD~1
+```
 ## Errors
 ```
 git status
