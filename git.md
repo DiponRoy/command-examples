@@ -1,6 +1,7 @@
 
 
 
+
 # git
 <p align="left">
     <a href="https://git-scm.com/" target="_blank"> <img src="https://www.vectorlogo.zone/logos/git-scm/git-scm-icon.svg" alt="git" width="40" height="40" /> </a>
@@ -50,8 +51,11 @@ git rev-parse --short HEAD
 git merge branchName	#Git Rebase vs Git Merge https://www.youtube.com/watch?v=Lo3u3TV7t5I
 git rebase branchName
 
+git reset --hard						#undo all uncommitted or unsaved changes
 git reset --hard HEAD
+git reset --hard HEAD~1					#undo last commit or merge
 git reset --hard origin/branch_name
+
 git revert commit_small_hash
 
 git log									#https://stackoverflow.com/a/1340245/2948523
