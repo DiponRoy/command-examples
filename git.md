@@ -51,6 +51,11 @@ git rev-parse --short HEAD
 git merge branchName	#Git Rebase vs Git Merge https://www.youtube.com/watch?v=Lo3u3TV7t5I
 git rebase branchName
 
+git add file.md 			#https://stackoverflow.com/questions/572549/difference-between-git-add-a-and-git-add
+git add -A 					#stages all changes
+git add . 					#stages new files and modifications, without deletions (on the current directory and its subdirectories).
+git add -u 					#stages modifications and deletions, without new files
+
 git reset --hard						#undo all uncommitted or unsaved changes
 git reset --hard HEAD
 git reset --hard HEAD~1					#undo last commit or merge
