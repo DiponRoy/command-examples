@@ -133,10 +133,33 @@ git log --full-history -1 -- Presentation/Nop.Web/package-lock.json
 https://www.freecodecamp.org/news/git-undo-merge-how-to-revert-the-last-merge-commit-in-git/
 ```
 git reset --soft HEAD~1					#undo last commit or merge, and changes as uncommit
+git reset --soft commit-ssh				#undo all commits after commit-ssh, and changes as uncommit
 
 git reset --hard HEAD~1					#undo last commit or merge
 git reset --merge HEAD~1
 ```
+
+**Rebase and recommit all the changes**
+https://www.youtube.com/watch?v=kMvLn8WcAII
+https://stackoverflow.com/a/68586918/2948523
+```
+git rebase dev
+resolve conflicts if any, do a new commit
+git rebase --continue
+
+get last commit of dev branch 6e6f0093bf1602baf074230378fe470e6447cc6a
+git rev-parse dev
+
+git reset --soft 6e6f0093bf1602baf074230378fe470e6447cc6a
+do new commit
+```
+
+**Squash**
+https://www.youtube.com/watch?v=RwvTrSm7zEY
+```
+
+```
+
 ## Errors
 ```
 git status
