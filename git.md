@@ -56,6 +56,9 @@ git add -A 					#stages all changes
 git add . 					#stages new files and modifications, without deletions (on the current directory and its subdirectories).
 git add -u 					#stages modifications and deletions, without new files
 
+git push --force
+git push --force-with-lease
+
 git reset --hard						#undo all uncommitted or unsaved changes
 git reset --hard HEAD
 git reset --hard HEAD~1					#undo last commit or merge
@@ -142,6 +145,7 @@ git reset --merge HEAD~1
 **Rebase and recommit all the changes**
 https://www.youtube.com/watch?v=kMvLn8WcAII
 https://stackoverflow.com/a/68586918/2948523
+https://stackoverflow.com/questions/8939977/git-push-rejected-after-feature-branch-rebase
 ```
 git rebase dev
 resolve conflicts if any, do a new commit
@@ -152,6 +156,8 @@ git rev-parse dev
 
 git reset --soft 6e6f0093bf1602baf074230378fe470e6447cc6a
 do new commit
+
+git push --force-with-lease
 ```
 
 **Squash**
