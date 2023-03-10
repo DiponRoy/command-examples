@@ -1,3 +1,4 @@
+
 - Basic https://www.w3schools.com/sql/sql_constraints.asp
 - Unique Indexes vs Unique Constraints https://www.mssqltips.com/sqlservertip/4270/difference-between-sql-server-unique-indexes-and-unique-constraints/
 - DateTime conversion number https://www.mssqltips.com/sqlservertip/1145/date-and-time-conversions-using-sql-server/
@@ -129,6 +130,41 @@ CREATE UNIQUE INDEX UIX_Users_UserName ON Users (UserName);
 
 DROP INDEX Users.UIX_Users_UserName;
 ALTER TABLE Users DROP CONSTRAINT UC_Users_UserName;
+```
+
+## Find Objects
+```
+--table
+SELECT TABLE_NAME
+FROM INFORMATION_SCHEMA.TABLES
+WHERE TABLE_TYPE = 'BASE TABLE'
+AND TABLE_NAME LIKE '%role%'
+ORDER BY TABLE_NAME
+
+--view
+SELECT v.name
+FROM INFORMATION_SCHEMA.VIEWS iv
+JOIN sys.views v on v.name = iv.Table_Name
+WHERE v.name LIKE '%role%'
+ORDER BY v.name
+
+--sp
+SELECT ROUTINE_NAME 
+FROM INFORMATION_SCHEMA.ROUTINES
+WHERE ROUTINE_TYPE = 'PROCEDURE'
+AND ROUTINE_NAME LIKE '%role%'
+```
+
+## String Split
+```
+DECLARE @FilePath VARCHAR(50) = 'My\Super\Long\String\With\Long\Words'
+DECLARE @FindChar VARCHAR(1) = '\'
+-- text before last slash
+SELECT LEFT(@FilePath, LEN(@FilePath) - CHARINDEX(@FindChar,REVERSE(@FilePath))) AS Before
+-- text after last slash
+SELECT RIGHT(@FilePath, CHARINDEX(@FindChar,REVERSE(@FilePath))-1) AS After
+-- the position of the last slash
+SELECT LEN(@FilePath) - CHARINDEX(@FindChar,REVERSE(@FilePath)) + 1 AS LastOccuredAt
 ```
 
 ## All In One
@@ -672,6 +708,65 @@ FROM Users
 ## PARTITION BY
 https://www.sqlshack.com/sql-partition-by-clause-overview/
 
+## Multiple rows into a single row 
+```
+DECLARE @tblUserRoles TABLE (
+	Id INT IDENTITY(1, 1),
+	UserId INT,
+	RoleId INT,
+	RoleSource VARCHAR(50)
+);
+INSERT INTO 
+@tblUserRoles (UserId, RoleId, RoleSource)
+VALUES
+(1, 1, 'User'),
+(1, 2, 'Admin'),
+(1, 3, 'Reseller'),
+(2, 1, 'User'),
+(3, 2, 'Admin'),
+(4, 3, 'Reseller');
+```
+**Comma Separated**
+```
+SELECT 
+	UserId, 
+	COALESCE(STUFF((SELECT ',' + CONVERT(NVARCHAR(MAX), RoleId) 
+			FROM @tblUserRoles AS AA
+			WHERE AA.UserId = A.UserId
+			ORDER BY RoleId
+			FOR XML PATH(''), TYPE).value('.','VARCHAR(MAX)')		/*if change .value to .VALUE it will not work*/
+			, 1, 1, ''), '') AS CommaSeparatedRoleIds
+FROM @tblUserRoles A
+GROUP BY UserId
+```
+**Additional Column**
+```
+SELECT 
+	p.UserId, 
+	MIN(CASE p.RoleSource WHEN 'User' THEN p.RoleId END) AS UserRoleId,
+	MIN(CASE p.RoleSource WHEN 'Admin' THEN p.RoleId END) AS AdminRoleId,
+	MIN(CASE p.RoleSource WHEN 'Reseller' THEN p.RoleId END) AS ResellerRoleId
+FROM @tblUserRoles p 
+WHERE p.RoleSource IN ('User', 'Admin', 'Reseller')
+GROUP BY UserId
+```
+**First Row**
+```
+WITH LastResponse
+AS
+(
+    SELECT 
+		*,
+		ROW_NUMBER() OVER(
+			PARTITION BY UserId		/*group by*/
+			ORDER BY Id DESC		/*for first try 'ASC'*/
+		) AS OrderId
+    FROM @tblUserRoles
+)
+SELECT *
+    FROM LastResponse
+    WHERE OrderId = 1;
+```
 ## tmpl
 **item**
 ```

@@ -146,10 +146,14 @@ git reset --merge HEAD~1
 https://www.youtube.com/watch?v=kMvLn8WcAII
 https://stackoverflow.com/a/68586918/2948523
 https://stackoverflow.com/questions/8939977/git-push-rejected-after-feature-branch-rebase
+
+https://stackoverflow.com/questions/25755933/force-overwrite-existing-branch-missing-from-tortoisegit-push-dialogue
 ```
 git rebase dev
 resolve conflicts if any, do a new commit
 git rebase --continue
+
+git push --force-with-lease
 
 get last commit of dev branch 6e6f0093bf1602baf074230378fe470e6447cc6a
 git rev-parse dev
@@ -157,7 +161,7 @@ git rev-parse dev
 git reset --soft 6e6f0093bf1602baf074230378fe470e6447cc6a
 do new commit
 
-git push --force-with-lease
+git push --force
 ```
 
 **Squash**
