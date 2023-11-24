@@ -1,4 +1,6 @@
 
+
+
 - Basic https://www.w3schools.com/sql/sql_constraints.asp
 - Unique Indexes vs Unique Constraints https://www.mssqltips.com/sqlservertip/4270/difference-between-sql-server-unique-indexes-and-unique-constraints/
 - DateTime conversion number https://www.mssqltips.com/sqlservertip/1145/date-and-time-conversions-using-sql-server/
@@ -153,6 +155,19 @@ SELECT ROUTINE_NAME
 FROM INFORMATION_SCHEMA.ROUTINES
 WHERE ROUTINE_TYPE = 'PROCEDURE'
 AND ROUTINE_NAME LIKE '%role%'
+
+--tr
+SELECT  name as trigger_name
+, object_name(parent_obj) as tableName
+, object_schema_name(parent_obj) as schemaName 
+,OBJECTPROPERTY( id, 'ExecIsUpdateTrigger') AS isupdate 
+,OBJECTPROPERTY( id, 'ExecIsDeleteTrigger') AS isdelete 
+,OBJECTPROPERTY( id, 'ExecIsInsertTrigger') AS isinsert 
+,OBJECTPROPERTY( id, 'ExecIsAfterTrigger') AS isafter 
+,OBJECTPROPERTY( id, 'ExecIsInsteadOfTrigger') AS isinsteadof 
+,OBJECTPROPERTY(id, 'ExecIsTriggerDisabled') AS [disabled] 
+FROM    sysobjects s
+WHERE s.type = 'TR' 
 ```
 
 ## String Split
@@ -379,13 +394,35 @@ SELECT * FROM Users WHERE CAST(CreatedON AS TIME) = '00:00:00.0000000';							  
 
 **DateTime to String**
 ```
-DECLARE @dateTime DATETIME = GETDATE();
+SELECT CONVERT(DATETIME, '2023-10-24', 102) --yyyy-mm-dd
+```
+
+**DateTime Overlapping**
+```
+DECLARE @spiffRanges TABLE (
+	Id VARCHAR(MAX),
+	RangeStartDateTime INT,
+	RangeEndDateTime INT
+)
+
+INSERT INTO @spiffRanges 
+VALUES 
+('Spiff0', 1, 4),
+('Spiff1', 5, 15),
+('Spiff2', 20, 30),
+--overlaping
+('Spiff3', 45, 55),
+('Spiff4', 50, 60)
+
 SELECT 
-	CONVERT(VARCHAR, @dateTime, 23),  --yyyy-mm-dd
-	CONVERT(VARCHAR, @dateTime, 8),   --hh:mm:ss
-	RIGHT(STUFF(SUBSTRING(CONVERT(VARCHAR, @dateTime, 22), 11, LEN(CONVERT(VARCHAR, @dateTime, 22))-1), 1, 0, replicate('0',11)),11),	--hh:mm:ss AM/PM
-	CONVERT(VARCHAR, @dateTime, 120),  --yyyy-mm-dd hh:mm:ss
-	CONVERT(VARCHAR, @dateTime, 121)   --yyyy-mm-dd hh:mm:ss:nnn
+	sr.*
+FROM @spiffRanges sr
+WHERE EXISTS (
+	SELECT *
+	FROM @spiffRanges rr
+	WHERE rr.Id <> sr.Id
+	 AND (sr.RangeStartDateTime <= rr.RangeEndDateTime) AND (sr.RangeEndDateTime >= rr.RangeStartDateTime)
+);
 ```
 
 ## Anonymous 
