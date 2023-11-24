@@ -1,6 +1,7 @@
 
 
 
+
 - Basic https://www.w3schools.com/sql/sql_constraints.asp
 - Unique Indexes vs Unique Constraints https://www.mssqltips.com/sqlservertip/4270/difference-between-sql-server-unique-indexes-and-unique-constraints/
 - DateTime conversion number https://www.mssqltips.com/sqlservertip/1145/date-and-time-conversions-using-sql-server/
@@ -804,6 +805,37 @@ SELECT *
     FROM LastResponse
     WHERE OrderId = 1;
 ```
+
+## Table As Param
+**With Procedure**
+```
+DROP PROCEDURE IF EXISTS GetItems;
+DROP TYPE IF EXISTS UT_Ids;
+
+GO
+CREATE TYPE UT_Ids AS TABLE
+(
+	Id INT NULL
+);
+GO
+CREATE OR ALTER PROCEDURE GetItems (
+	@ids UT_Ids READONLY,
+	@storeId INT
+)
+AS
+BEGIN
+	SELECT 
+		s.Id Id,
+		@storeId StoreId
+	FROM @ids AS s
+END
+
+GO 
+DECLARE @ids UT_Ids;
+INSERT INTO @ids VALUES (1), (2);
+EXEC GetItems @ids, 10;
+```
+
 ## tmpl
 **item**
 ```
