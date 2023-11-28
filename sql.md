@@ -2,6 +2,7 @@
 
 
 
+
 - Basic https://www.w3schools.com/sql/sql_constraints.asp
 - Unique Indexes vs Unique Constraints https://www.mssqltips.com/sqlservertip/4270/difference-between-sql-server-unique-indexes-and-unique-constraints/
 - DateTime conversion number https://www.mssqltips.com/sqlservertip/1145/date-and-time-conversions-using-sql-server/
@@ -834,6 +835,83 @@ GO
 DECLARE @ids UT_Ids;
 INSERT INTO @ids VALUES (1), (2);
 EXEC GetItems @ids, 10;
+```
+
+## Function
+**Scalar Valued**
+```
+DROP FUNCTION IF EXISTS GetName;
+
+GO
+CREATE FUNCTION GetName (
+	@FirstName VARCHAR(MAX),
+	@LastName VARCHAR(MAX)
+) 
+RETURNS VARCHAR(MAX) 
+BEGIN
+	RETURN @FirstName +' ' +@LastName;
+END
+
+GO
+SELECT dbo.GetName('x', 'y') AS FullName;
+```
+
+**Table Valued**
+```
+DROP TABLE IF EXISTS Games;
+DROP FUNCTION IF EXISTS GetGames;
+
+GO
+CREATE TABLE Games(
+	Id INT,
+	[Name] VARCHAR(MAX),
+	[TypeId] INT
+);
+GO
+CREATE FUNCTION GetGames(
+	@TypeId INT
+) 
+RETURNS TABLE
+AS
+RETURN (
+	SELECT * FROM Games WHERE TypeId = @TypeId
+)
+
+GO
+SELECT * FROM dbo.GetGames(1);
+```
+
+**User Type As Param**
+```
+DROP TABLE IF EXISTS Games;
+DROP FUNCTION IF EXISTS GetGames;
+DROP TYPE IF EXISTS UT_Ids;
+
+GO
+CREATE TYPE UT_Ids AS TABLE
+(
+	Id INT NULL
+);
+GO
+CREATE TABLE Games(
+	Id INT,
+	[Name] VARCHAR(MAX),
+	[TypeId] INT
+);
+GO
+CREATE FUNCTION GetGames(
+	@TypeIds UT_Ids READONLY
+) 
+RETURNS TABLE
+AS
+RETURN (
+	SELECT * FROM Games WHERE TypeId IN (SELECT Id FROM @TypeIds)
+)
+
+GO
+DECLARE @ids UT_Ids;
+INSERT INTO @ids VALUES (1), (2);
+SELECT * FROM dbo.GetGames(@ids);
 ```
 
 ## tmpl
