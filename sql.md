@@ -3,6 +3,7 @@
 
 
 
+
 - Basic https://www.w3schools.com/sql/sql_constraints.asp
 - Unique Indexes vs Unique Constraints https://www.mssqltips.com/sqlservertip/4270/difference-between-sql-server-unique-indexes-and-unique-constraints/
 - DateTime conversion number https://www.mssqltips.com/sqlservertip/1145/date-and-time-conversions-using-sql-server/
@@ -97,11 +98,28 @@ ALTER TABLE [dbo].[Users] ADD VisibleOnId INT NULL CONSTRAINT DF_Users_VisibleOn
 
 ## CHECK CONSTRAINT
 ```
-ALTER TABLE Users ADD CONSTRAINT CHK_Users_AccountStatusId CHECK (AccountStatusId IN (0, 1, 2));
+ALTER TABLE Users ADD CONSTRAINT CK_Users_AccountStatusId CHECK (AccountStatusId IN (0, 1, 2));
 
-ALTER TABLE Users DROP CONSTRAINT CHK_Users_AccountStatusId;
+ALTER TABLE Users DROP CONSTRAINT CK_Users_AccountStatusId;
 ```
+```
+SELECT * FROM sys.objects WHERE sys.objects.type = 'C'
 
+SELECT 
+	SCHEMA_NAME(schema_id) AS SchemaName, --QUOTENAME()
+	OBJECT_NAME(parent_object_id) AS TableName,
+	* 
+FROM sys.check_constraints dc
+
+SELECT 
+    TableName = t.Name,
+    ColumnName = c.Name,
+    dc.Name,
+    dc.definition
+FROM sys.tables t
+INNER JOIN sys.check_constraints dc ON t.object_id = dc.parent_object_id
+INNER JOIN sys.columns c ON dc.parent_object_id = c.object_id AND c.column_id = dc.parent_column_id
+```
 ## UNIQUE KEY CONSTRAINT
 ```
 ALTER TABLE Users ADD CONSTRAINT UC_Users_UserName UNIQUE (UserName);
@@ -913,6 +931,48 @@ DECLARE @ids UT_Ids;
 INSERT INTO @ids VALUES (1), (2);
 SELECT * FROM dbo.GetGames(@ids);
 ```
+
+## Variables
+**@@ROWCOUNT**
+```
+DECLARE @tableSource TABLE(
+	Id INT IDENTITY(1, 1),
+	[Name] VARCHAR(MAX)
+)
+
+INSERT INTO @tableSource VALUES ('x'), ('y');
+PRINT @@ROWCOUNT;	--Inserted rows count
+
+UPDATE @tableSource SET [Name] = 'x' WHERE [Name] = 'x';
+PRINT @@ROWCOUNT;	--Updated rows count
+
+DELETE FROM @tableSource WHERE [Name] = 'x';
+PRINT @@ROWCOUNT;	--Deleted rows count
+```
+
+**@@FETCH_STATUS**
+```
+DECLARE @id INT, @name VARCHAR(250);
+DECLARE tblCoursor CURSOR FOR
+	SELECT Id, UserName
+	FROM [Users]  o
+	WHERE o.AccountStatusId = 2;
+OPEN tblCoursor
+	FETCH NEXT FROM tblCoursor INTO @id, @name
+	WHILE(@@FETCH_STATUS = 0)
+	BEGIN
+		PRINT CONCAT(@id, ' ', @name);
+		FETCH NEXT FROM tblCoursor INTO @id, @name
+	END
+CLOSE tblCoursor
+DEALLOCATE tblCoursor
+```
+
+**@@VERSION**
+```
+SELECT @@VERSION
+```
+
 
 ## tmpl
 **item**
