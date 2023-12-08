@@ -482,6 +482,189 @@ SELECT
 FROM TempUsers;
 ```
 
+## UPDATE 
+```
+IF object_id('tempdb..#tblUsers') IS NOT NULL
+    DROP TABLE #tblUsers;
+IF object_id('tempdb..#tempUsers') IS NOT NULL
+    DROP TABLE #tempUsers;
+
+CREATE TABLE #tblUsers
+(
+    Id INT,
+    FirstName VARCHAR(MAX) NOT NULL,
+	LastName VARCHAR(MAX) NOT NULL
+);
+INSERT INTO #tblUsers (Id, FirstName, LastName)
+VALUES 
+(1, 'User', '1'),
+(2, 'User', '2');
+CREATE TABLE #tempUsers
+(
+    Id INT,
+    FullName VARCHAR(MAX) NULL,
+	StatusId INT
+);
+INSERT INTO #tempUsers (Id, StatusId)
+VALUES 
+(1, 0),
+(2, 0),
+(3, 0);
+```
+```
+UPDATE #tempUsers 
+	SET StatusId = 1
+WHERE Id > 0;
+```
+**Using Alias**
+```
+UPDATE u
+	SET u.StatusId = 2
+FROM #tempUsers AS u
+WHERE u.Id > 0;
+```
+**Using WITH**
+```
+WITH
+Users
+AS
+(
+	SELECT *
+	FROM #tempUsers
+	WHERE Id > 0
+)
+UPDATE Users
+SET StatusId = 3;
+```
+**Using JOIN**
+```
+UPDATE tu
+	SET tu.FullName = u.FirstName +' ' +u.LastName
+FROM #tempUsers AS tu
+JOIN #tblUsers AS u ON tu.Id = u.Id
+WHERE tu.Id > 0;
+```
+
+## DELETE 
+```
+IF object_id('tempdb..#tblUsers') IS NOT NULL
+    DROP TABLE #tblUsers;
+IF object_id('tempdb..#tempUsers') IS NOT NULL
+    DROP TABLE #tempUsers;
+
+CREATE TABLE #tblUsers
+(
+    Id INT,
+    FirstName VARCHAR(MAX) NOT NULL,
+	LastName VARCHAR(MAX) NULL
+);
+INSERT INTO #tblUsers (Id, FirstName, LastName)
+VALUES 
+(1, 'User', '1'),
+(2, 'User', '2');
+CREATE TABLE #tempUsers
+(
+    Id INT,
+    FullName VARCHAR(MAX) NULL,
+	StatusId INT
+);
+INSERT INTO #tempUsers (Id, StatusId)
+VALUES 
+(1, 0),
+(2, 0),
+(3, 0);
+```
+```
+DELETE FROM #tempUsers WHERE Id > 0;
+```
+**Using Alias**
+```
+DELETE u FROM #tempUsers u WHERE u.Id > 0;
+```
+**Using WITH**
+```
+WITH
+Users
+AS
+(
+	SELECT *
+	FROM #tempUsers
+	WHERE Id > 0
+)
+DELETE Users;
+```
+**Using JOIN**
+```
+DELETE tu
+FROM #tempUsers AS tu
+JOIN #tblUsers AS u ON tu.Id = u.Id
+WHERE tu.Id > 0;
+```
+
+## INTO 
+```
+DROP TABLE IF EXISTS tblTestUsers;  
+DROP TABLE IF EXISTS NewTestUsers;
+IF object_id('tempdb..#newTempUsers') IS NOT NULL
+    DROP TABLE #newTempUsers;
+	 
+CREATE TABLE tblTestUsers
+(
+    Id INT,
+    FirstName VARCHAR(MAX) NOT NULL,
+	LastName VARCHAR(MAX) NULL
+);
+INSERT INTO tblTestUsers (Id, FirstName, LastName)
+VALUES 
+(1, 'User', '1'),
+(2, 'User', '2');
+INSERT INTO tblTestUsers
+VALUES 
+(3, 'User', '3');
+
+SELECT Id, (FirstName +' ' +LastName) AS FullName, 1 AS StatusId
+INTO #newTempUsers
+FROM tblTestUsers
+
+SELECT Id, (FirstName +' ' +LastName) AS FullName, 1 AS StatusId
+INTO NewTestUsers
+FROM tblTestUsers
+
+
+DECLARE @tempUsers TABLE 
+(
+    Id INT,
+    FullName VARCHAR(MAX) NULL,
+	StatusId INT
+);
+--SELECT Id, (FirstName +' ' +LastName) AS FullName, 1 AS StatusId
+--FROM tblTestUsers
+--INTO @tempUsers
+INSERT INTO tblTestUsers
+OUTPUT inserted.Id, inserted.FirstName +' ' +inserted.LastName, 0
+INTO @tempUsers
+VALUES 
+(4, 'User', '4');
+
+
+
+DECLARE @Id INT;
+--SELECT 3.14 INTO @id;
+--SELECT TOP(1) Id INTO @id FROM tblTestUsers;
+--SELECT TOP(1) Id FROM tblTestUsers INTO @id;
+--SELECT (SELECT TOP(1) Id FROM tblTestUsers) INTO @id;
+SELECT TOP(1) @Id = Id FROM tblTestUsers
+SET @Id = (SELECT TOP(1) Id FROM tblTestUsers)
+```
+**Using JOIN**
+```
+DELETE tu
+FROM #tempUsers AS tu
+JOIN #tblUsers AS u ON tu.Id = u.Id
+WHERE tu.Id > 0;
+```
+
+
 ## OUTPUT 
 Doesn't work with funciton
 ```
@@ -764,6 +947,41 @@ FROM Users
 
 ## PARTITION BY
 https://www.sqlshack.com/sql-partition-by-clause-overview/
+
+## ROW_NUMBER Without Column
+```
+IF object_id('tempdb..#tempUsers') IS NOT NULL
+    DROP TABLE #tempUsers;
+IF object_id('tempdb..#newTempUsers') IS NOT NULL
+    DROP TABLE #newTempUsers;
+	
+CREATE TABLE #tempUsers
+(
+    Id INT,
+    FirstName VARCHAR(MAX) NOT NULL,
+	LastName VARCHAR(MAX) NULL
+);
+INSERT INTO #tempUsers (Id, FirstName, LastName)
+VALUES 
+(1, 'User', '1'),
+(2, 'User', '2');
+INSERT INTO #tempUsers
+VALUES 
+(3, 'User', '3');
+
+
+SELECT 
+	*,
+	IDENTITY(INT, 1, 1) AS SelectedOrder
+INTO #newTempUsers
+FROM #tempUsers;
+SELECT * FROM #newTempUsers;
+
+SELECT 
+	*,
+	ROW_NUMBER() OVER(ORDER BY (SELECT 1)) AS SelectedOrder		--1 can be NULL
+FROM #tempUsers;
+```
 
 ## Multiple rows into a single row 
 ```
