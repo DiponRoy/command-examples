@@ -4,6 +4,7 @@
 
 
 
+
 - Basic https://www.w3schools.com/sql/sql_constraints.asp
 - Unique Indexes vs Unique Constraints https://www.mssqltips.com/sqlservertip/4270/difference-between-sql-server-unique-indexes-and-unique-constraints/
 - DateTime conversion number https://www.mssqltips.com/sqlservertip/1145/date-and-time-conversions-using-sql-server/
@@ -188,6 +189,146 @@ SELECT  name as trigger_name
 ,OBJECTPROPERTY(id, 'ExecIsTriggerDisabled') AS [disabled] 
 FROM    sysobjects s
 WHERE s.type = 'TR' 
+```
+
+## ROWVERSION
+```
+DROP TABLE IF EXISTS TestUser;
+GO
+CREATE TABLE TestUser (
+	Id INT IDENTITY(1, 1) NOT NULL,
+	FirstName VARCHAR(MAX) NULL,
+	LastName VARCHAR(MAX) NULL,
+	[RowVersion] ROWVERSION,
+);
+
+GO
+TRUNCATE TABLE TestUser;
+INSERT INTO TestUser (FirstName, LastName) VALUES (1, 2);				--0x0000000000011173
+UPDATE TestUser SET FirstName = '11', LastName = '22' WHERE Id = 1;		--0x0000000000011174
+UPDATE TestUser SET FirstName = '111', LastName = '222' WHERE Id = 1;	--0x0000000000011175
+
+SELECT * FROM TestUser;
+SELECT @@DBTS AS LastUsedRowVersion;
+```
+
+**Add RowVersion**
+```
+ALTER TABLE TestUser ADD [RowVersion] ROWVERSION;		--Will add column, value will be auto populated
+```
+
+**Check RowVersion in Update/Delete**
+```
+TRUNCATE TABLE TestUser;
+INSERT INTO TestUser (FirstName, LastName) VALUES (1, 2);																			--0x000000000001117A
+UPDATE TestUser SET FirstName = '11', LastName = '22' WHERE Id = 1 AND [RowVersion] =  CONVERT(BINARY(8), '0x000000000001117A', 1);	--0x000000000001117B
+DELETE FROM TestUser  WHERE Id = 1 AND [RowVersion] =  CONVERT(BINARY(8), '0x000000000001117B', 1);	
+
+SELECT * FROM TestUser WHERE Id = 1;
+```
+
+## Trigger
+https://stackoverflow.com/questions/20205639/insert-delete-update-trigger-in-sql-server
+https://www.red-gate.com/simple-talk/databases/sql-server/database-administration-sql-server/sql-server-triggers-good-scary/#:~:text=A%20trigger%20is%20a%20set,operation%20within%20the%20MERGE%20statement.
+```
+DROP TABLE IF EXISTS TestUser;
+DROP TABLE IF EXISTS TestUser_Audit;
+GO
+CREATE TABLE TestUser (
+	Id INT IDENTITY(1, 1) NOT NULL,
+	FirstName VARCHAR(MAX) NULL,
+	LastName VARCHAR(MAX) NULL,
+	[RowVersion] VARCHAR(MAX) NULL,
+);
+CREATE TABLE TestUser_Audit (
+	AuditId INT IDENTITY(1, 1) NOT NULL,
+	AuditType VARCHAR(MAX)  NOT NULL,
+	AuditAt DATETIME NOT NULL DEFAULT(GETUTCDATE()),
+
+	Id INT NOT NULL,
+	FirstName VARCHAR(MAX) NULL,
+	LastName VARCHAR(MAX) NULL,
+	[RowVersion] VARCHAR(MAX) NULL,
+	[OldRowVersion] VARCHAR(MAX) NULL
+);
+```
+```
+GO
+CREATE TRIGGER TR_TestUser_Audit
+ON [dbo].[TestUser]
+AFTER UPDATE, INSERT, DELETE 
+AS
+BEGIN
+SET NOCOUNT ON;
+
+DECLARE @auditType VARCHAR (50) = '';
+DECLARE @oldRowVersion VARCHAR (MAX) = '';
+
+-- update
+IF EXISTS (SELECT * FROM Inserted) AND EXISTS (SELECT * FROM Deleted)
+BEGIN
+    SET @auditType = 'UPDATE';
+	SELECT @oldRowVersion = [RowVersion] FROM Deleted;
+END
+
+-- insert
+IF EXISTS (SELECT * FROM Inserted) AND NOT EXISTS(SELECT * FROM Deleted)
+BEGIN
+    SET @auditType = 'INSERT';
+END
+
+-- delete
+IF EXISTS (SELECT * FROM Deleted) AND NOT EXISTS(SELECT * FROM Inserted)
+BEGIN
+    SET @auditType = 'DELETE';
+END
+
+-- log
+IF OBJECT_ID('tempdb..#tmpTbl') IS NOT NULL 
+	DROP TABLE #tmpTbl;
+WITH Logs
+AS
+(
+	SELECT *, 1 AS PriorityNo FROM Inserted
+	UNION 
+	SELECT *, 2 AS PriorityNo FROM Deleted
+)
+SELECT TOP(1) *
+INTO #tmpTbl
+FROM Logs
+ORDER BY PriorityNo;
+
+-- add log
+INSERT INTO TestUser_Audit  
+(
+	AuditType
+	,Id
+	,FirstName
+	,LastName
+	,[RowVersion]
+	,[OldRowVersion]
+)
+SELECT 
+	@auditType
+    ,Id
+    ,FirstName
+    ,LastName
+    ,[RowVersion]
+    ,@oldRowVersion
+FROM #tmpTbl
+SET NOCOUNT OFF;
+END
+```
+```
+TRUNCATE TABLE TestUser;
+TRUNCATE TABLE TestUser_Audit;
+INSERT INTO TestUser (FirstName, LastName, [RowVersion])
+VALUES (1, 2, 3);
+UPDATE TestUser SET FirstName = '11', LastName = '22', [RowVersion] = '33' WHERE Id = 1;
+UPDATE TestUser SET FirstName = '111', LastName = '222', [RowVersion] = '333' WHERE Id = 1;
+DELETE FROM TestUser WHERE Id = 1
+SELECT * FROM TestUser;
+SELECT * FROM TestUser_Audit;
 ```
 
 ## String Split
@@ -979,7 +1120,8 @@ SELECT * FROM #newTempUsers;
 
 SELECT 
 	*,
-	ROW_NUMBER() OVER(ORDER BY (SELECT 1)) AS SelectedOrder		--1 can be NULL
+	ROW_NUMBER() OVER(ORDER BY (SELECT 1)) AS SelectedOrder,	--1 can be NULL
+	ROW_NUMBER() OVER(ORDER BY @@SPID) AS AnotherSelectedOrder	--@@SPID is process id
 FROM #tempUsers;
 ```
 
@@ -1151,14 +1293,46 @@ SELECT * FROM dbo.GetGames(@ids);
 ```
 
 ## Variables
+**@@VERSION**
+```
+SELECT @@VERSION
+```
+
+**@@SPID**
+```
+SELECT @@SPID	--process id, not session id
+
+SELECT *
+FROM sys.sysprocesses 
+WHERE spid = @@SPID
+```
+
+**@@IDENTITY**
+```
+DECLARE @tableSource TABLE(
+	Id INT IDENTITY(1, 1),
+	[Name] VARCHAR(MAX),
+	[CreatedOnUtc] DATETIME NOT NULL DEFAULT(GETDATE())
+)
+
+INSERT INTO @tableSource([Name]) VALUES ('x');
+SELECT @@IDENTITY;	--1
+
+INSERT INTO @tableSource([Name]) VALUES ('y'), ('z');
+SELECT @@IDENTITY;	--3 id of z, last inserted id
+```
+
 **@@ROWCOUNT**
 ```
 DECLARE @tableSource TABLE(
 	Id INT IDENTITY(1, 1),
-	[Name] VARCHAR(MAX)
+	[Name] VARCHAR(MAX),
+	[CreatedOnUtc] DATETIME NOT NULL DEFAULT(GETDATE())
 )
-
-INSERT INTO @tableSource VALUES ('x'), ('y');
+INSERT INTO @tableSource([Name]) VALUES ('y'), ('z');
+```
+```
+INSERT INTO @tableSource([Name]) VALUES ('x');
 PRINT @@ROWCOUNT;	--Inserted rows count
 
 UPDATE @tableSource SET [Name] = 'x' WHERE [Name] = 'x';
@@ -1166,6 +1340,17 @@ PRINT @@ROWCOUNT;	--Updated rows count
 
 DELETE FROM @tableSource WHERE [Name] = 'x';
 PRINT @@ROWCOUNT;	--Deleted rows count
+```
+```
+WHILE 1 = 1
+BEGIN
+	DELETE TOP (1)
+	FROM @tableSource
+	IF @@rowcount = 0
+	BEGIN
+		BREAK;
+	END;
+END;
 ```
 
 **@@FETCH_STATUS**
@@ -1186,11 +1371,10 @@ CLOSE tblCoursor
 DEALLOCATE tblCoursor
 ```
 
-**@@VERSION**
+**@@DBTS**
 ```
-SELECT @@VERSION
+SELECT @@DBTS AS LastUsedRowVersion;
 ```
-
 
 ## tmpl
 **item**
