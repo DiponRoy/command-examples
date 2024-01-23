@@ -5,6 +5,7 @@
 
 
 
+
 - Basic https://www.w3schools.com/sql/sql_constraints.asp
 - Unique Indexes vs Unique Constraints https://www.mssqltips.com/sqlservertip/4270/difference-between-sql-server-unique-indexes-and-unique-constraints/
 - DateTime conversion number https://www.mssqltips.com/sqlservertip/1145/date-and-time-conversions-using-sql-server/
@@ -199,7 +200,7 @@ CREATE TABLE TestUser (
 	Id INT IDENTITY(1, 1) NOT NULL,
 	FirstName VARCHAR(MAX) NULL,
 	LastName VARCHAR(MAX) NULL,
-	[RowVersion] ROWVERSION,
+	[RowVersion] ROWVERSION,			--Can use TIMESTAMP
 );
 
 GO
@@ -208,7 +209,11 @@ INSERT INTO TestUser (FirstName, LastName) VALUES (1, 2);				--0x000000000001117
 UPDATE TestUser SET FirstName = '11', LastName = '22' WHERE Id = 1;		--0x0000000000011174
 UPDATE TestUser SET FirstName = '111', LastName = '222' WHERE Id = 1;	--0x0000000000011175
 
-SELECT * FROM TestUser;
+SELECT 
+	*
+	,CONVERT(BIGINT, [RowVersion]) AS RowVersionNo
+FROM TestUser;
+
 SELECT @@DBTS AS LastUsedRowVersion;
 ```
 
@@ -899,6 +904,49 @@ GO
 DECLARE @amount DECIMAL
 EXEC SP_GenerateBill @month=12, @year=12, @totalAmount=@amount OUTPUT;
 SELECT @amount AS BillAmount;
+```
+**With CURSOR**
+```
+DROP PROCEDURE IF EXISTS GetItems;
+DROP TYPE IF EXISTS UT_Ids;
+
+GO
+CREATE TYPE UT_Ids AS TABLE
+(
+	Id INT NULL
+);
+GO
+CREATE OR ALTER PROCEDURE GetItems (
+	@ids UT_Ids READONLY,
+	@listCursor CURSOR VARYING OUTPUT
+)
+AS
+BEGIN
+	SET @listCursor = CURSOR FORWARD_ONLY STATIC FOR
+	SELECT 
+		s.Id Id
+	FROM @ids AS s
+	WHERE s.Id > 0
+
+	OPEN @listCursor;
+END
+
+GO 
+
+DECLARE @ids UT_Ids;
+INSERT INTO @ids VALUES (-1), (0), (1), (2);
+DECLARE @MyCursor CURSOR;
+EXEC GetItems @ids, @MyCursor OUTPUT;
+
+DECLARE @id INT;
+FETCH NEXT FROM @MyCursor INTO @id; 
+WHILE (@@FETCH_STATUS = 0)  
+BEGIN;  
+	PRINT @id;
+	FETCH NEXT FROM @MyCursor INTO @id; 
+END;  
+CLOSE @MyCursor;  
+DEALLOCATE @MyCursor; 
 ```
 
 ## PIVOT
