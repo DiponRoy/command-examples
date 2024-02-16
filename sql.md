@@ -1281,6 +1281,25 @@ END
 GO
 SELECT dbo.GetName('x', 'y') AS FullName;
 ```
+```
+DROP FUNCTION IF EXISTS GetName;
+
+GO
+CREATE FUNCTION GetName (
+	@FirstName VARCHAR(MAX),
+	@LastName VARCHAR(MAX)
+) 
+RETURNS VARCHAR(MAX)
+BEGIN
+	DECLARE @item VARCHAR(MAX);
+	SET @item = @FirstName +' ' +@LastName;
+	SET @item = LTRIM(RTRIM(@item));
+	RETURN @item;
+END
+
+GO
+SELECT dbo.GetName('x', 'y') AS FullName;
+```
 
 **Table Valued**
 ```
@@ -1303,6 +1322,44 @@ RETURN (
 	SELECT * FROM Games WHERE TypeId = @TypeId
 )
 
+GO
+SELECT * FROM dbo.GetGames(1);
+```
+```
+DROP TABLE IF EXISTS Games;
+DROP FUNCTION IF EXISTS GetGames;
+
+GO
+CREATE TABLE Games(
+	Id INT,
+	[Name] VARCHAR(MAX),
+	[TypeId] INT
+);
+GO
+CREATE FUNCTION GetGames(
+	@RuleId INT
+) 
+RETURNS @items TABLE (
+	Id INT,
+	[Name] VARCHAR(MAX),
+	[TypeId] INT
+)
+AS
+BEGIN
+	IF @RuleId IN (10, 12)
+	BEGIN
+		INSERT INTO @items
+		SELECT * FROM Games WHERE TypeId = @RuleId
+	END
+	ELSE
+	BEGIN
+		INSERT INTO @items
+		SELECT * FROM Games
+	END
+	UPDATE @items SET [Name] = LTRIM(RTRIM([Name]));
+	DELETE FROM @items WHERE Id > 15;
+RETURN;     
+END
 GO
 SELECT * FROM dbo.GetGames(1);
 ```
