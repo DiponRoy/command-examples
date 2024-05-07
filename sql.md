@@ -463,8 +463,24 @@ SET @userType = CASE
 SELECT @userType; 
 ```
 
-
-## IDENTITY ON OF
+## NOCOUNT ON OFF
+Remove rows affected message sql server
+```
+ IF OBJECT_ID (N'tempdb..#tblStudents') IS NOT NULL DROP TABLE #tblStudents;                    
+ CREATE TABLE #tblStudents                    
+ (      
+ 	Id INT IDENTITY(1, 1),   
+	[Name] VARCHAR(MAX),
+ );
+GO
+SET NOCOUNT ON;
+INSERT INTO #tblStudents([Name]) VALUES ('a'), ('b');
+SET NOCOUNT OFF;
+GO
+/*only (3 rows affected) will be printed*/
+INSERT INTO #tblStudents([Name]) VALUES ('c'), ('d'), ('e');
+```
+## IDENTITY ON OFF
 ```
 SET IDENTITY_INSERT [dbo].[AccountStatus] ON 
 /*do something*/
@@ -476,7 +492,6 @@ ALTER TABLE [dbo].[AccountStatus] NOCHECK CONSTRAINT ALL;
 /*do something*/
 ALTER TABLE [dbo].[AccountStatus] CHECK CONSTRAINT ALL;
 ```
-
 ## RESET IDENTITY
 ```
 TRUNCATE TABLE tblName;
@@ -516,7 +531,92 @@ WHEN NOT MATCHED BY TARGET
 WHEN NOT MATCHED BY SOURCE
     THEN DELETE;
 ```
+## EXISTS/OUTER APPLY/IN/ANY/ALL
+```
+DECLARE @tblStudent TABLE (
+	Id INT
+);
+DECLARE @tblStudentBlackList TABLE (
+	StudentId INT
+);
+INSERT INTO @tblStudent VALUES (1), (2);
+INSERT INTO @tblStudentBlackList VALUES (1);
 
+SELECT * 
+FROM @tblStudent s
+WHERE EXISTS (
+	SELECT *
+	FROM @tblStudentBlackList b
+	WHERE b.StudentId = s.Id
+);
+SELECT * 
+FROM @tblStudent s
+OUTER APPLY (
+	SELECT TOP(1) *
+	FROM @tblStudentBlackList b
+	WHERE b.StudentId = s.Id
+) b
+WHERE b.StudentId IS NOT NULL;
+SELECT * 
+FROM @tblStudent s
+WHERE s.Id IN (
+	SELECT b.StudentId
+	FROM @tblStudentBlackList b
+);
+SELECT * 
+FROM @tblStudent s
+WHERE s.Id = ANY (
+	SELECT b.StudentId
+	FROM @tblStudentBlackList b
+	WHERE b.StudentId = s.Id
+);
+SELECT * 
+FROM @tblStudent s
+WHERE s.Id = ALL (
+	SELECT b.StudentId
+	FROM @tblStudentBlackList b
+	--WHERE b.StudentId = s.Id
+);
+
+
+
+
+SELECT * 
+FROM @tblStudent s
+WHERE NOT EXISTS (
+	SELECT *
+	FROM @tblStudentBlackList b
+	WHERE b.StudentId = s.Id
+);
+SELECT * 
+FROM @tblStudent s
+OUTER APPLY (
+	SELECT TOP(1) *
+	FROM @tblStudentBlackList b
+	WHERE b.StudentId = s.Id
+) b
+WHERE b.StudentId IS NULL;
+SELECT * 
+FROM @tblStudent s
+WHERE s.Id NOT IN (
+	SELECT b.StudentId
+	FROM @tblStudentBlackList b
+);
+SELECT * 
+FROM @tblStudent s
+WHERE s.Id <> ANY (
+	SELECT b.StudentId
+	FROM @tblStudentBlackList b
+	--WHERE b.StudentId = s.Id
+);
+SELECT * 
+FROM @tblStudent s
+WHERE s.Id = ALL (
+	SELECT b.StudentId
+	FROM @tblStudentBlackList b
+	WHERE b.StudentId = s.Id
+);
+```
 
 ## DATETIME
 ```
@@ -558,9 +658,25 @@ SELECT * FROM Users WHERE CAST(CreatedON AS TIME) <> '00:00:00.0000000';							 
 SELECT * FROM Users WHERE CAST(CreatedON AS TIME) = '00:00:00.0000000';							  	  --dates without time
 ```
 
-**DateTime to String**
+**String to DateTime**
 ```
 SELECT CONVERT(DATETIME, '2023-10-24', 102) --yyyy-mm-dd
+```
+
+https://www.sqlservertutorial.net/sql-server-system-functions/convert-string-to-datetime/
+https://learn.microsoft.com/en-us/sql/t-sql/functions/cast-and-convert-transact-sql?view=sql-server-ver16
+```
+SELECT GETDATE()
+/*ISO*/
+SELECT 
+	CONVERT(DATETIME, '2024-12-31')						--yyyy-mm-dd
+	,CONVERT(DATETIME, '2024-12-31 12:00:00.000')		--yyyy-mm-dd hh:mi:ss:mmm
+	,CONVERT(DATETIME, '2024-12-31 23:59:59.000')		--yyyy-mm-dd hh:mi:ss:mmm
+/*USA*/
+SELECT 
+	CONVERT(DATETIME, '12-31-2024')						--mm-dd-yyyy
+	,CONVERT(DATETIME, '12-31-2024 12:00:00.000')		--mm-dd-yyyy hh:mi:ss:mmm
+	,CONVERT(DATETIME, '12-31-2024 23:59:59.000')		--mm-dd-yyyy hh:mi:ss:mmm
 ```
 
 **DateTime Overlapping**
@@ -589,6 +705,43 @@ WHERE EXISTS (
 	WHERE rr.Id <> sr.Id
 	 AND (sr.RangeStartDateTime <= rr.RangeEndDateTime) AND (sr.RangeEndDateTime >= rr.RangeStartDateTime)
 );
+```
+
+**Query Time**
+```
+IF OBJECT_ID (N'tempdb..#tblOldTime') IS NOT NULL DROP TABLE #tblOldTime;                    
+CREATE TABLE #tblOldTime                    
+(
+	StartDateTime DATETIME2 NULL,
+	EndDateTime DATETIME2 NULL,
+);
+INSERT INTO #tblOldTime (StartDateTime) VALUES (GETDATE());
+/*
+	Query
+*/
+UPDATE #tblOldTime SET EndDateTime = GETDATE(); 
+
+
+DECLARE @oldStartDateTime DATETIME2, @oldEndDateTime DATETIME2;
+SET @oldStartDateTime = (SELECT TOP(1) StartDateTime FROM #tblOldTime);
+SET @oldEndDateTime = (SELECT TOP(1) EndDateTime FROM #tblOldTime);
+DECLARE @diff INT = DATEDIFF(SECOND, @oldStartDateTime, @oldEndDateTime);
+PRINT 'Old Sp time in seconds: ' + CAST(@diff AS VARCHAR);
+
+PRINT 
+	convert(varchar(255), (@diff / 86400)) + ' Days ' +
+	convert(varchar(255), ((@diff % 86400) /3600)) + ' Hours '+
+	convert(varchar(255), (((@diff % 86400) % 3600) / 60)) + ' Mins '+
+	convert(varchar(255), (((@diff % 86400) % 3600) % 60)) + ' sec ';
+
+
+SET @diff = DATEDIFF(MILLISECOND, @oldStartDateTime, @oldEndDateTime);
+PRINT
+	convert(varchar(10), (@diff/86400000)) + ' Days ' +
+	convert(varchar(10), ((@diff%86400000)/3600000)) + ' Hours '+
+	convert(varchar(10), (((@diff%86400000)%3600000)/60000)) + ' Mins '+
+	convert(varchar(10), ((((@diff%86400000)%3600000)%60000)/1000)) + ' sec ' +
+	convert(varchar(10), (((@diff%86400000)%3600000)%1000)) + ' ms ';
 ```
 
 ## Anonymous 
@@ -1396,6 +1549,99 @@ DECLARE @ids UT_Ids;
 INSERT INTO @ids VALUES (1), (2);
 SELECT * FROM dbo.GetGames(@ids);
 ```
+
+**With OUTER APPLY**
+```
+DROP TABLE IF EXISTS Games;
+DROP FUNCTION IF EXISTS GetGames;
+DROP TYPE IF EXISTS UT_Ids;
+
+GO
+CREATE TYPE UT_Ids AS TABLE
+(
+	Id INT NULL
+);
+GO
+CREATE TABLE Games(
+	Id INT,
+	[Name] VARCHAR(MAX),
+	[TypeId] INT
+);
+GO
+CREATE FUNCTION GetGames(
+	@TypeIds UT_Ids READONLY
+) 
+RETURNS TABLE
+AS
+RETURN (
+	SELECT * FROM Games WHERE TypeId IN (SELECT Id FROM @TypeIds)
+)
+
+GO
+DECLARE @ids UT_Ids;
+INSERT INTO @ids VALUES (1), (2);CREATE OR ALTER FUNCTION FN_GetPointDetail(
+	@Id INT
+)
+RETURNS @items TABLE (
+	OwnerPercentage INT NOT NULL,
+	ParticipantPercentage INT NOT NULL
+)
+AS
+BEGIN
+	IF @Id BETWEEN 1 AND 9
+	BEGIN
+		INSERT INTO @items 
+		VALUES(@Id*10, @Id*10*10)
+	END
+RETURN;
+END;
+
+GO
+DECLARE @items TABLE (
+	Id INT
+);
+INSERT INTO @items VALUES (0), (1), (2), (10);
+
+SELECT *
+FROM @items i
+OUTER APPLY (
+	SELECT TOP(1) *
+	FROM FN_GetPointDetail(i.Id)
+)d;
+SELECT * FROM dbo.GetGames(@ids);
+```
+
+## OUTER APPLY
+**@@VERSION**
+```
+WITH
+Payments(PaidAmount, Unit, UnitPrice)
+AS
+(
+	SELECT CAST(100 AS DECIMAL), 2, CAST(100 AS DECIMAL)
+	UNION ALL
+	SELECT CAST(50 AS DECIMAL), 2, CAST(100 AS DECIMAL)
+)
+, Details
+AS
+(
+	SELECT 
+		*,
+		PaidAmount/CalculatedAmountFromUnitAndUnitPrice AS PaidAndCalculatedAmountRatio
+	FROM Payments
+	OUTER APPLY (
+		SELECT Unit*UnitPrice AS CalculatedAmountFromUnitAndUnitPrice
+	) Points
+)
+SELECT *
+FROM Details
+```
+
+## OPTION
+**OPTION (RECOMPILE)**
+**OPTION (MAXRECURSION 1000)**
+**OPTION (NOLOCK)**
+
 
 ## Variables
 **@@VERSION**
