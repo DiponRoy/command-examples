@@ -57,9 +57,11 @@ END
 ```
 ALTER TABLE [dbo].[Users] ADD CONSTRAINT PK_Users PRIMARY KEY(Id);
 ALTER TABLE [dbo].[Users] ADD CONSTRAINT PK_Users PRIMARY KEY CLUSTERED (Id ASC);
+ALTER TABLE [dbo].[Users] ADD CONSTRAINT PK_Users PRIMARY KEY NONCLUSTERED (Id ASC);
 
 ALTER TABLE [dbo].[Users] DROP CONSTRAINT PK_Users;
 ```
+
 **Composite key**
 ```
 ALTER TABLE [dbo].[Group_User] ADD CONSTRAINT PK_Group_User PRIMARY KEY(GroupId, UserId);
@@ -80,6 +82,68 @@ ALTER TABLE [dbo].[Users] DROP CONSTRAINT FK_Users_UserTypes;
 ALTER TABLE [dbo].[GroupUserImage] ADD CONSTRAINT FK_GroupUserImage_GroupUser FOREIGN KEY (GroupId, UserId) REFERENCES Group_User(GroupId, UserId);
 
 ALTER TABLE [dbo].[GroupUserImage] DROP CONSTRAINT FK_GroupUserImage_GroupUser;
+```
+**Disable key**
+```
+ALTER TABLE TestStudent NOCHECK CONSTRAINT FK_TestStudent_TestDepartment;
+--inserte/update row with invalid FK data
+--delete row used as FK
+ALTER TABLE TestStudent CHECK CONSTRAINT FK_TestStudent_TestDepartment;
+```
+```
+DROP TABLE IF EXISTS TestStudent
+DROP TABLE IF EXISTS TestDepartment
+GO
+CREATE TABLE TestDepartment (
+	Id INT IDENTITY(1, 1),
+	[Name] VARCHAR(MAX) NOT NULL
+
+	CONSTRAINT PK_TestDepartment PRIMARY KEY(Id)
+)
+GO
+CREATE TABLE TestStudent (
+	Id INT IDENTITY(1, 1),
+	[Name] VARCHAR(MAX) NOT NULL,
+	DepartmentId INT NOT NULL
+
+	CONSTRAINT PK_TestStudent PRIMARY KEY(Id)
+	CONSTRAINT FK_TestStudent_TestDepartment FOREIGN KEY (DepartmentId) REFERENCES TestDepartment (Id)
+)
+GO
+
+INSERT INTO TestDepartment([Name]) VALUES ('Dept 1'), ('Dept 2')
+TRUNCATE TABLE TestStudent;
+INSERT INTO TestStudent ([Name], DepartmentId) VALUES ('Student 1', 1);
+INSERT INTO TestStudent ([Name], DepartmentId) VALUES ('Student 2', 2);
+
+
+INSERT INTO TestStudent ([Name], DepartmentId) VALUES ('Student 1', 10);		--error, 10 not valid FK
+UPDATE TestStudent SET DepartmentId = 10 WHERE DepartmentId = 1					--error, 10 not valid FK
+DELETE FROM TestDepartment WHERE Id = 2											--error, 1 used as FK
+
+
+ALTER TABLE TestStudent NOCHECK CONSTRAINT FK_TestStudent_TestDepartment;
+INSERT INTO TestStudent ([Name], DepartmentId) VALUES ('Student 1', 10);		--inserted, even 10 is not valid FK
+UPDATE TestStudent SET DepartmentId = 20 WHERE DepartmentId = 10				--updated, even 20 is not valid FK
+DELETE FROM TestDepartment WHERE Id = 2											--deleted, even 2 in use as FK
+
+
+ALTER TABLE TestStudent CHECK CONSTRAINT FK_TestStudent_TestDepartment;
+INSERT INTO TestStudent ([Name], DepartmentId) VALUES ('Student 1', 20);		--error, 20 not valid FK
+UPDATE TestStudent SET DepartmentId = 10 WHERE DepartmentId = 1					--error
+DELETE FROM TestDepartment WHERE Id = 1											--error
+
+
+SELECT Pe.DepartmentId
+FROM TestStudent pe
+WHERE NOT EXISTS (
+	SELECT Id
+	FROM TestDepartment b
+	WHERE b.Id = pe.Id
+)
+
+SELECT * FROM TestStudent
+SELECT * FROM TestDepartment
 ```
 
 ## DEFAULT CONSTRAINT
@@ -146,6 +210,23 @@ DROP INDEX Users.IX_Users_UserName;
 CREATE INDEX IX_Users_CreatedON ON Users (CreatedON DESC);
 ```
 
+## NONCLUSTERED INDEX
+```
+CREATE NONCLUSTERED INDEX [IX_PointsEntity_Customer_Mapping_CreatedOnUtc]
+    ON [dbo].[PointsEntity_Customer_Mapping]([CreatedOnUtc] ASC)
+	
+GO
+CREATE NONCLUSTERED INDEX [IX_PointsEntity_Customer_Mapping_CreatedOnUtc]
+    ON [dbo].[PointsEntity_Customer_Mapping]([CreatedOnUtc] ASC)
+    INCLUDE([PointsEntityId], [CustomerId], [ProductLineId], [Points]);
+```
+## CLUSTERED INDEX
+```
+GO
+CREATE CLUSTERED INDEX [IX_PointsEntity_Customer_Mapping_CreatedOnUtc_Clustered]
+    ON [dbo].[PointsEntity_Customer_Mapping]([CreatedOnUtc] ASC)
+```
+
 
 ## UNIQUE INDEX
 ```
@@ -164,6 +245,20 @@ FROM INFORMATION_SCHEMA.TABLES
 WHERE TABLE_TYPE = 'BASE TABLE'
 AND TABLE_NAME LIKE '%role%'
 ORDER BY TABLE_NAME
+
+--column on table
+SELECT * 
+FROM   sys.columns 
+WHERE  object_id = OBJECT_ID(N'[dbo].[Person]') 
+AND name = 'ColumnName'
+
+SELECT COL_LENGTH('RewardPointsHistory', 'Deleted')
+
+
+--column on temp table
+SELECT * 
+FROM tempdb.sys.columns 
+WHERE [object_id] = OBJECT_ID(N'tempdb..#TmpRewardPointsHistory');
 
 --view
 SELECT v.name
@@ -190,6 +285,32 @@ SELECT  name as trigger_name
 ,OBJECTPROPERTY(id, 'ExecIsTriggerDisabled') AS [disabled] 
 FROM    sysobjects s
 WHERE s.type = 'TR' 
+```
+
+## Wait
+```
+ /*
+ 24h
+ 120 yyyy-mm-dd hh:mm:ss 
+ 121 yyyy-mm-dd hh:mm:ss.mmm 
+ */
+PRINT CONVERT(VARCHAR(100), GETDATE(), 120);
+WAITFOR DELAY '00:00:15';		--wait for 15s
+PRINT CONVERT(VARCHAR(100), GETDATE(), 121);
+```
+
+## Random
+```
+--Number
+DECLARE @max_value INT = 100;
+DECLARE @min_value INT = 11;
+SELECT FLOOR(RAND() * (@max_value - @min_value + 1)) + @min_value
+
+
+--Date
+DECLARE @startDate DATETIME = CONVERT(DATETIME, '2024-01-01', 102);
+DECLARE @endDate DATETIME =  CONVERT(DATETIME, '2024-12-31', 102);
+SELECT DATEADD(DAY, RAND(CHECKSUM(NEWID()))*(1+DATEDIFF(DAY, @StartDate, @EndDate)),@StartDate);
 ```
 
 ## ROWVERSION
@@ -233,6 +354,160 @@ SELECT * FROM TestUser WHERE Id = 1;
 ```
 
 ## Trigger
+**Basic**
+https://learn.microsoft.com/en-us/sql/t-sql/statements/create-trigger-transact-sql?view=sql-server-ver16
+```
+GO
+DROP TABLE IF EXISTS TblRewardPointsHistory;
+GO
+CREATE TABLE TblRewardPointsHistory (
+	Id INT IDENTITY(1, 1) NOT NULL,
+	CustomerId INT,
+	Points INT,
+	Deleted BIT,
+	CreatedOnUtc DATETIME
+)
+
+DROP TRIGGER IF EXISTS TR_TblRewardPointsHistory_Before
+GO
+CREATE OR ALTER TRIGGER TR_TblRewardPointsHistory_Before
+ON [dbo].[TblRewardPointsHistory]
+BEFORE INSERT, UPDATE, DELETE
+AS
+BEGIN
+SET NOCOUNT ON;		--doesn't show row affected message, if rows inserted from here
+	PRINT 'Before Trigger'
+SET NOCOUNT OFF;
+END
+
+DROP TRIGGER IF EXISTS TR_TblRewardPointsHistory_After
+GO
+CREATE OR ALTER TRIGGER TR_TblRewardPointsHistory_After
+ON [dbo].[TblRewardPointsHistory]
+AFTER INSERT, UPDATE, DELETE
+AS
+BEGIN
+SET NOCOUNT ON;
+	PRINT 'After Trigger'
+SET NOCOUNT OFF;
+END
+
+GO
+
+TRUNCATE TABLE TblRewardPointsHistory;
+
+-- Trigger Fired once, where inserted single row
+INSERT INTO TblRewardPointsHistory (CustomerId, Points, Deleted, CreatedOnUtc)
+VALUES
+(1, 20, 0, '2022-01-01');
+
+-- Trigger fired only once, but inserted multiple row
+INSERT INTO TblRewardPointsHistory (CustomerId, Points, Deleted, CreatedOnUtc)
+VALUES
+(1, 30, 0, '2023-01-01'),
+(1, 40, 0, '2024-01-01');
+
+
+-- Trigger fired twice, where inserted two row
+DECLARE @mainTran VARCHAR(250) = 'TRANSACTION_NAME' ;
+BEGIN TRANSACTION @mainTran;
+BEGIN TRY
+	INSERT INTO TblRewardPointsHistory (CustomerId, Points, Deleted, CreatedOnUtc)
+	VALUES
+	(2, 40, 0, '2024-01-01');
+	INSERT INTO TblRewardPointsHistory (CustomerId, Points, Deleted, CreatedOnUtc)
+	VALUES
+	(2, 40, 0, '2024-01-01');
+	/*commit*/
+	COMMIT TRANSACTION @mainTran;
+	PRINT 'Success';
+END TRY
+BEGIN CATCH
+	ROLLBACK TRANSACTION @mainTran;
+	PRINT 'Fail';
+	DECLARE @error VARCHAR = 'Error message.';
+	THROW 50000, @error, 1;   
+END CATCH
+```
+**Use with TRANSACTION**
+```
+GO
+DROP TABLE IF EXISTS TblRewardPointsHistory;
+DROP TABLE IF EXISTS TblCustomerBalance;
+GO
+CREATE TABLE TblRewardPointsHistory (
+	Id INT IDENTITY(1, 1) NOT NULL,
+	CustomerId INT,
+	Points INT,
+	Deleted BIT,
+	CreatedOnUtc DATETIME,
+	PointsBalance INT,
+	PreviousPointsBalance INT,
+)
+CREATE TABLE TblCustomerBalance (
+	Id INT IDENTITY(1, 1) NOT NULL,
+	CustomerId INT,
+	TotalPoint INT
+)
+GO
+CREATE OR ALTER TRIGGER TR_TblRewardPointsHistory_Update_Balance
+ON [dbo].[TblRewardPointsHistory]
+AFTER INSERT 
+AS
+BEGIN
+SET NOCOUNT ON;
+	DECLARE @customerId INT = (SELECT CustomerId FROM Inserted);
+	DECLARE @PreviousBalanceAmount INT = (SELECT PreviousPointsBalance FROM Inserted);
+	DECLARE @newPoint INT = (SELECT Points FROM Inserted);
+	DECLARE @newBalanceAmount INT = (SELECT PointsBalance FROM Inserted);
+	DECLARE @Ids_tbl TABLE ([Id] INT);
+
+	--PRINT @customerId;
+	--PRINT @PreviousBalanceAmount;
+	--PRINT @newPoint;
+	--PRINT @newBalanceAmount;
+
+	--DECLARE @id INT = (
+	--	SELECT Id FROM TblCustomerBalance
+	--	WHERE CustomerId = @customerId 
+	--	AND TotalPoint = @PreviousBalanceAmount
+	--	AND @newBalanceAmount = (TotalPoint + @newPoint)
+	--);
+	--PRINT @id;
+
+	/*update balance*/
+	UPDATE TblCustomerBalance
+		SET TotalPoint = @newBalanceAmount --TotalPoint + @newPoint
+	OUTPUT inserted.Id INTO @Ids_tbl
+	WHERE CustomerId = @customerId 
+	AND TotalPoint = @PreviousBalanceAmount
+	AND @newBalanceAmount = (TotalPoint + @newPoint)
+	--PRINT @@ROWCOUNT;
+
+	--IF @@ROWCOUNT <> 1	/*@@ROWCOUNT not working here, raising error everytime*/
+	IF (SELECT COUNT(Id) FROM @Ids_tbl) <> 1
+	BEGIN
+		ROLLBACK;		/*we have to rollback this way*/
+		RAISERROR (
+			'Customer balance row not found inside trigger TR_TblRewardPointsHistory_Update_Balance.',	-- Message text.
+			16,																							-- Severity or error number.
+			1																							-- State.
+		);	
+	END
+SET NOCOUNT OFF;
+END
+GO
+
+
+GO
+TRUNCATE TABLE TblRewardPointsHistory;
+-- Trigger Fired once, where inserted single row
+INSERT INTO TblRewardPointsHistory (CustomerId, Points, Deleted, CreatedOnUtc, PointsBalance, PreviousPointsBalance)
+VALUES
+(1, 20, 0, '2022-01-01', 20, 0);
+```
+
+**Log**
 https://stackoverflow.com/questions/20205639/insert-delete-update-trigger-in-sql-server
 https://www.red-gate.com/simple-talk/databases/sql-server/database-administration-sql-server/sql-server-triggers-good-scary/#:~:text=A%20trigger%20is%20a%20set,operation%20within%20the%20MERGE%20statement.
 ```
@@ -384,6 +659,11 @@ OPEN tblCoursor
 	FETCH NEXT FROM tblCoursor INTO @id, @name
 	WHILE(@@FETCH_STATUS = 0)
 	BEGIN
+		IF @id = 10
+		BEGIN
+			BREAK;
+		END		
+		
 		PRINT CONCAT(@id, ' ', @name);
 		FETCH NEXT FROM tblCoursor INTO @id, @name
 	END
@@ -391,13 +671,32 @@ CLOSE tblCoursor
 DEALLOCATE tblCoursor
 ```
 
+https://stackoverflow.com/questions/28360212/how-to-manually-break-the-cursor-within-a-while-loop
+
 ## TRY CATCH
+Severity Numbers https://learn.microsoft.com/en-us/sql/relational-databases/errors-events/database-engine-error-severities?view=sql-server-ver16
 ```
 BEGIN TRY
 	/*Do something*/
 	PRINT 'Hello';
+
+	/*throw error SQL Server 12+*/
+	THROW 
+		50000,							-- Severity or error number.
+		'Error raised in TRY block.',	-- Message text.
+		1;								-- State.
+	
+	/*throw error*/
+	RAISERROR (
+		'Error raised in TRY block.',	-- Message text.
+		16,								-- Severity or error number.
+		1								-- State.
+	);	
+	PRINT 'Done';
 END TRY
 BEGIN CATCH
+	PRINT 'Fail';
+	
 	DECLARE @error VARCHAR = 'Error message.';
 	THROW 50000, @error, 1;  
 END CATCH
@@ -421,6 +720,111 @@ BEGIN CATCH
 	THROW 50000, @error, 1;   
 END CATCH
 ```
+
+**INSERT**
+```
+DROP TABLE IF EXISTS TblCustomerBalance
+CREATE TABLE TblCustomerBalance (
+	CustomerId INT,
+	TotalPoint INT,
+
+	CONSTRAINT PK_TblCustomerBalance PRIMARY KEY(CustomerId)
+)
+
+--SELECT * FROM TblCustomerBalance
+TRUNCATE TABLE TblCustomerBalance
+INSERT INTO TblCustomerBalance
+SELECT *
+FROM (
+	VALUES
+	(1, 10),
+	(2, 20),
+	(3, 30),
+	(4, 40),
+
+	(1, 100)		--Error Row, for this no row will be inserted
+) AS s(CustomerId, TotalPoint)
+```
+
+**UPDATE**
+```
+DROP TABLE IF EXISTS TblCustomerBalance
+CREATE TABLE TblCustomerBalance (
+	CustomerId INT,
+	TotalPoint INT,
+
+	CONSTRAINT PK_TblCustomerBalance PRIMARY KEY(CustomerId),
+	CONSTRAINT CK_TblCustomerBalance_TotalPoint CHECK (TotalPoint > -1)
+)
+
+--SELECT * FROM TblCustomerBalance
+TRUNCATE TABLE TblCustomerBalance
+INSERT INTO TblCustomerBalance
+SELECT *
+FROM (
+	VALUES
+	(1, 10),
+	(2, 20),
+	(3, 30),
+	(4, 40)
+) AS s(CustomerId, TotalPoint)
+
+
+;WITH NewBalance
+AS
+(
+	SELECT *
+	FROM (
+		VALUES
+		(1, 100),
+		(2, 200),
+		(3, 300),
+
+		(4, -400)	--Error Row, for this no row will be inserted
+	) AS s(CustomerId, TotalPoint)
+)
+UPDATE cb
+	SET cb.TotalPoint = nb.TotalPoint
+FROM TblCustomerBalance cb
+JOIN NewBalance nb ON cb.CustomerId = nb.CustomerId
+```
+
+**DELETE**
+```
+DROP TABLE IF EXISTS TblCustomerBalance
+DROP TABLE IF EXISTS TblCustomer
+CREATE TABLE TblCustomer(
+	Id INT NOT NULL,
+	[Name] VARCHAR(200),
+
+	CONSTRAINT PK_TblCustomer PRIMARY KEY(Id),
+)
+CREATE TABLE TblCustomerBalance (
+	CustomerId INT NOT NULL,
+	TotalPoint INT,
+
+	CONSTRAINT PK_TblCustomerBalance PRIMARY KEY(CustomerId),
+	CONSTRAINT FK_TblCustomerBalance_TblCustomer FOREIGN KEY (CustomerId) REFERENCES TblCustomer (Id)
+)
+
+/*
+SELECT * FROM TblCustomer
+SELECT * FROM TblCustomerBalance
+*/
+INSERT INTO TblCustomer
+VALUES 
+(1, 'Customer1'),
+(2, 'Customer2'),
+(3, 'Customer3'),
+(4, 'Customer4');
+INSERT INTO TblCustomerBalance
+VALUES
+(4, 40)			-- Delete will not work for this row
+
+/*TRUNCATE TABLE TblCustomerBalance*/
+DELETE FROM TblCustomer
+```
+
 
 ## IF ELSE
 ```
@@ -498,7 +902,7 @@ TRUNCATE TABLE tblName;
 --or
 DELETE FROM tblName;
 
-DBCC CHECKIDENT('tblName', RESEED, 0);
+DBCC CHECKIDENT('tblName', RESEED, 0);	--here 0 is the last used id, on new insert the new id will be 1
 ```
 
 ## MERGE
@@ -656,6 +1060,13 @@ SELECT * FROM Users WHERE CreatedON BETWEEN '2021-12-20 00:00:00.000' AND '2022-
 SELECT * FROM Users WHERE '2021-12-20 10:34:00' < CreatedON AND CreatedON < '2021-12-21 00:00:00';    --date time greater less
 SELECT * FROM Users WHERE CAST(CreatedON AS TIME) <> '00:00:00.0000000';							  --dates with time
 SELECT * FROM Users WHERE CAST(CreatedON AS TIME) = '00:00:00.0000000';							  	  --dates without time
+```
+
+**DateTime to String**
+```
+PRINT CONVERT(VARCHAR(100), GETDATE(), 102);	/*yyyy-mm-dd*/
+PRINT CONVERT(VARCHAR(100), GETDATE(), 120);	/*yyyy-mm-dd hh:mm:ss 24h*/
+PRINT CONVERT(VARCHAR(100), GETDATE(), 121);	/*yyyy-mm-dd hh:mm:ss.mmm 24h*/
 ```
 
 **String to DateTime**
@@ -963,6 +1374,48 @@ JOIN #tblUsers AS u ON tu.Id = u.Id
 WHERE tu.Id > 0;
 ```
 
+## JOIN 
+**CROSS Vs OUTER APPLY**
+```
+DECLARE @tblProduct TABLE (
+	Id INT,
+	[Name] VARCHAR(MAX)
+)
+DECLARE @tblProductSpiff TABLE(
+	Id INT,
+	ProductId INT,
+	ClaimTypeId INT
+)
+
+INSERT INTO @tblProduct(Id, [Name])
+VALUES 
+(1, 'Product1'),	--- 1 spiff
+(2, 'Product2'),	--- 2 spiff
+(3, 'Product3')		--- No spiff, will not be selected in cross apply, but will be selected in outer apply
+INSERT INTO @tblProductSpiff (Id, ProductId, ClaimTypeId)
+VALUES
+(1, 1, 1),
+(2, 1, 2),
+(3, 2, 2)
+
+SELECT *
+FROM @tblProduct p
+CROSS APPLY (
+	SELECT 
+		ps.ClaimTypeId
+	FROM @tblProductSpiff ps
+	WHERE p.Id = ps.ProductId
+)PP
+
+SELECT *
+FROM @tblProduct p
+OUTER APPLY (
+	SELECT 
+		ps.ClaimTypeId
+	FROM @tblProductSpiff ps
+	WHERE p.Id = ps.ProductId
+)PP
+```
 
 ## OUTPUT 
 Doesn't work with funciton
@@ -1191,6 +1644,48 @@ DECLARE @pageSize INT = 10, @pageNumber INT = 10;
 SELECT * 
 FROM Users 
 ORDER BY ID OFFSET @pageSize*(@pageNumber-1) ROWS FETCH NEXT @pageSize ROWS ONLY;
+```
+
+## Running Total
+```
+DECLARE @tblCustomerPoints TABLE (
+	Id INT,
+	CustomerId INT,
+	Points INT,
+	Deleted BIT
+)
+
+INSERT INTO @tblCustomerPoints
+VALUES
+(6, 2, 4, 0),
+(5, 2, 3, 0),
+(4, 2, 2, 0),
+
+(3, 1, 40, 0),
+(2, 1, 30, 0),
+(1, 1, 20, 0)
+
+
+SELECT 
+	*,
+	(	
+		SELECT ISNULL(SUM(ncp.Points), 0)
+		FROM @tblCustomerPoints ncp
+		WHERE ncp.CustomerId = cp.CustomerId
+		AND ncp.Deleted = 0
+		AND ncp.Id <= cp.Id
+	) PointBalance
+FROM @tblCustomerPoints cp
+WHERE Deleted = 0
+ORDER BY Id DESC
+
+/*https://stackoverflow.com/questions/30861919/what-is-rows-unbounded-preceding-used-for-in-teradata*/
+SELECT 
+	*,
+	(ISNULL(SUM(Points) OVER (PARTITION BY CustomerId ORDER BY Id ROWS UNBOUNDED PRECEDING), 0)) PointBalance
+FROM @tblCustomerPoints
+WHERE Deleted = 0
+ORDER BY Id DESC
 ```
 
 ## ROW_NUMBER, RANK, DENSE_RANK
