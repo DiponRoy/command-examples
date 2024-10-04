@@ -52,6 +52,28 @@ BEGIN
 	ALTER TABLE [dbo].[Users] ADD [Zone] NVARCHAR(50) NULL;
 END
 ```
+```
+--IF COL_LENGTH('dbo.Users', 'Zone') IS NOT NULL
+--IF(SELECT COUNT(1) FROM sys.columns WHERE [Name] = N'Zone' AND Object_ID = Object_ID(N'dbo.Users')) = 1
+--IF(SELECT COUNT(1) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'dbo' AND TABLE_NAME = 'Users' AND COLUMN_NAME = 'Zone') = 1
+```
+
+**Find**
+```
+SELECT 
+	sch.name			AS SchemaName,
+    tab.name			AS TableName,
+    col.name			AS ColumnName,
+	col.is_nullable	AS IsColumnNullable,
+	TYPE_NAME(col.system_type_id) AS DataType
+FROM sys.tables tab
+INNER JOIN sys.schemas sch
+    ON tab.schema_id = sch.schema_id
+INNER JOIN sys.columns col
+    ON col.object_id =  tab.object_id
+WHERE col.name LIKE '%Spiff%'
+```
+
 
 ## PRIMARY KEY CONSTRAINT
 ```
@@ -111,6 +133,7 @@ CREATE TABLE TestStudent (
 )
 GO
 
+
 INSERT INTO TestDepartment([Name]) VALUES ('Dept 1'), ('Dept 2')
 TRUNCATE TABLE TestStudent;
 INSERT INTO TestStudent ([Name], DepartmentId) VALUES ('Student 1', 1);
@@ -118,17 +141,17 @@ INSERT INTO TestStudent ([Name], DepartmentId) VALUES ('Student 2', 2);
 
 
 INSERT INTO TestStudent ([Name], DepartmentId) VALUES ('Student 1', 10);		--error, 10 not valid FK
-UPDATE TestStudent SET DepartmentId = 10 WHERE DepartmentId = 1					--error, 10 not valid FK
+UPDATE TestStudent SET DepartmentId = 20 WHERE DepartmentId = 1					--error, 20 not valid FK
 DELETE FROM TestDepartment WHERE Id = 2											--error, 1 used as FK
 
 
 ALTER TABLE TestStudent NOCHECK CONSTRAINT FK_TestStudent_TestDepartment;
 INSERT INTO TestStudent ([Name], DepartmentId) VALUES ('Student 1', 10);		--inserted, even 10 is not valid FK
 UPDATE TestStudent SET DepartmentId = 20 WHERE DepartmentId = 10				--updated, even 20 is not valid FK
-DELETE FROM TestDepartment WHERE Id = 2											--deleted, even 2 in use as FK
+DELETE FROM TestDepartment WHERE Id = 2											--deleted, even 2 is in use as FK
 
 
-ALTER TABLE TestStudent CHECK CONSTRAINT FK_TestStudent_TestDepartment;
+ALTER TABLE TestStudent CHECK CONSTRAINT FK_TestStudent_TestDepartment;			--no issue will old bad data
 INSERT INTO TestStudent ([Name], DepartmentId) VALUES ('Student 1', 20);		--error, 20 not valid FK
 UPDATE TestStudent SET DepartmentId = 10 WHERE DepartmentId = 1					--error
 DELETE FROM TestDepartment WHERE Id = 1											--error
@@ -144,6 +167,76 @@ WHERE NOT EXISTS (
 
 SELECT * FROM TestStudent
 SELECT * FROM TestDepartment
+```
+
+**Find**
+https://stackoverflow.com/questions/17501840/how-can-i-find-out-what-foreign-key-constraint-references-a-table-in-sql-server
+https://sqldusty.com/2015/07/08/tsql-script-to-find-foreign-key-references-to-a-given-column/
+
+All
+```
+SELECT 
+    obj.name			AS ForeignKeyConstraintName,	--Fk
+    sch1.name			AS SchemaName,					--to table
+    tab1.name			AS TableName,
+    col1.name			AS ColumnName,
+	col1.is_nullable	AS IsColumnNullable,
+	sch2.name			AS ReferencedSchemaName,		--from table
+    tab2.name			AS ReferencedTableName,
+    col2.name			AS ReferencedColumnName
+FROM 
+     sys.foreign_key_columns fkc
+INNER JOIN sys.objects obj
+    ON obj.object_id = fkc.constraint_object_id
+INNER JOIN sys.tables tab1
+    ON tab1.object_id = fkc.parent_object_id
+INNER JOIN sys.schemas sch1
+    ON tab1.schema_id = sch1.schema_id
+INNER JOIN sys.columns col1
+    ON col1.column_id = parent_column_id AND col1.object_id = tab1.object_id
+INNER JOIN sys.tables tab2
+    ON tab2.object_id = fkc.referenced_object_id
+INNER JOIN sys.schemas sch2
+    ON tab2.schema_id = sch2.schema_id
+INNER JOIN sys.columns col2
+    ON col2.column_id = referenced_column_id 
+        AND col2.object_id =  tab2.object_id
+		
+WHERE tab2.name = 'RewardPointsHistory'			--table name
+    AND col2.name = 'Id'						--column
+```
+
+Foreign key in a table
+```
+SELECT
+	f.[name] AS ForeignKeyConstraintName,
+	OBJECT_NAME(f.parent_object_id) TableName,
+	COL_NAME(fk.parent_object_id,fk.parent_column_id) ColumnName,
+	OBJECT_NAME(f.referenced_object_id) ReferencedTableName,
+	COL_NAME(fk.referenced_object_id,fk.referenced_column_id) as ReferencedColumnName
+FROM sys.foreign_keys AS f
+    INNER JOIN sys.foreign_key_columns AS fk 
+        ON f.OBJECT_ID = fk.constraint_object_id
+    INNER JOIN sys.tables t
+        ON fk.referenced_object_id = t.object_id
+WHERE f.parent_object_id = object_id('RewardPointsHistory')					--table name
+```
+
+Foreign key from a table
+```
+SELECT OBJECT_NAME(f.object_id) as ForeignKeyConstraintName,
+    OBJECT_NAME(f.parent_object_id) TableName,
+    COL_NAME(fk.parent_object_id,fk.parent_column_id) ColumnName,
+    OBJECT_NAME(fk.referenced_object_id) as ReferencedTableName,
+    COL_NAME(fk.referenced_object_id,fk.referenced_column_id) as ReferencedColumnName
+
+FROM sys.foreign_keys AS f
+    INNER JOIN sys.foreign_key_columns AS fk 
+        ON f.OBJECT_ID = fk.constraint_object_id
+    INNER JOIN sys.tables t
+        ON fk.referenced_object_id = t.object_id
+WHERE OBJECT_NAME(fk.referenced_object_id) = 'RewardPointsHistory'			--table name
+    and COL_NAME(fk.referenced_object_id,fk.referenced_column_id) = 'Id'	--column
 ```
 
 ## DEFAULT CONSTRAINT
@@ -720,6 +813,46 @@ BEGIN CATCH
 	THROW 50000, @error, 1;   
 END CATCH
 ```
+DML and DDL mix example
+```
+DROP TABLE IF EXISTS Trn_Test_Customer
+DROP TABLE IF EXISTS Trn_Test_User
+GO
+CREATE TABLE Trn_Test_Customer (
+	Id INT,
+	[Name] VARCHAR(MAX)
+)
+CREATE TABLE Trn_Test_User (
+	Id INT,
+	[Name] VARCHAR(MAX)
+)
+INSERT INTO Trn_Test_Customer (Id, [Name]) 
+VALUES (1, 'Name 1'), (2, 'Name 2')
+
+
+GO
+BEGIN TRANSACTION;
+--SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+--SET XACT_ABORT ON;
+
+/*DML and DDL*/
+INSERT INTO Trn_Test_User (Id, [Name])				--DML
+SELECT Id, [Name]
+FROM Trn_Test_Customer;								
+DELETE FROM Trn_Test_Customer;						--DDL
+ALTER TABLE Trn_Test_Customer DROP COLUMN [Name];	--DDL
+ALTER TABLE Trn_Test_User ADD IsActive BIT NULL;	--DDL
+INSERT INTO Trn_Test_Customer (Id, [Name])			--DDL
+VALUES (3, 'Name 3')								--this will throw error as [Name] was dropped
+
+COMMIT TRANSACTION;
+--SET TRANSACTION ISOLATION LEVEL READ COMMITTED;
+GO
+
+
+SELECT * FROM Trn_Test_Customer
+SELECT * FROM Trn_Test_User
+```
 
 **INSERT**
 ```
@@ -825,6 +958,24 @@ VALUES
 DELETE FROM TblCustomer
 ```
 
+## Dynamic SQL
+```
+DROP TABLE IF EXISTS Test_Customer
+GO
+CREATE TABLE Test_Customer (
+	Id INT,
+	[Name] VARCHAR(MAX)
+)
+INSERT INTO Test_Customer (Id, [Name]) 
+VALUES (1, 'Name 1'), (2, 'Name 2');
+
+
+DECLARE @sql NVARCHAR(MAX) = N'DELETE FROM Test_Customer';
+EXEC sp_executesql @sql;
+
+DECLARE @sql1 NVARCHAR(MAX) = N'SELECT * FROM Test_Customer';
+EXEC(@sql1);
+```
 
 ## IF ELSE
 ```
@@ -1686,6 +1837,34 @@ SELECT
 FROM @tblCustomerPoints
 WHERE Deleted = 0
 ORDER BY Id DESC
+```
+
+## LAG, LEAD
+
+```
+DECLARE @tblCustomerPointsBalance TABLE (
+	Id INT,
+	CustomerId INT,
+	Points INT,
+	PointsBalance INT
+)
+
+INSERT INTO @tblCustomerPointsBalance
+VALUES
+(6, 2, 4, 9),
+(5, 2, 3, 5),
+(4, 2, 2, 2),
+
+(3, 1, 40, 90),
+(2, 1, 30, 50),
+(1, 1, 20, 20)
+
+SELECT 
+	*,
+	LEAD(PointsBalance, 1) OVER (PARTITION BY CustomerId ORDER BY Id DESC) 	AS PreviousPointsBalance,
+	PointsBalance 															AS CurrentPointsBalance,
+	LAG(PointsBalance, 1) OVER (PARTITION BY CustomerId ORDER BY Id DESC) 	AS NextPointsBalance
+FROM @tblCustomerPointsBalance
 ```
 
 ## ROW_NUMBER, RANK, DENSE_RANK

@@ -72,6 +72,10 @@ git log --author=Dipon					#where autor like dipon
 git log --first-parent develop/13929	#where branch name develop/13929
 git log --grep=13929 --author=Dipon --first-parent develop/13929_Product_Hiererchy_Fix --reverse --pretty=format:"%h"
 
+
+git diff --name-only --diff-filter=U --relative							#List conflicted files https://stackoverflow.com/a/10874862
+git config --global alias.conflicts "diff --name-only --diff-filter=U"
+
 git rev-list							#https://manpages.ubuntu.com/manpages/bionic/man1/git-rev-list.1.html
 
 git cherry-pick af02e0b					#https://stackoverflow.com/questions/1670970/how-to-cherry-pick-multiple-commits	
